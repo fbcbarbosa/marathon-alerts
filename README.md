@@ -2,6 +2,8 @@
 
 Marathon Alerts is a tool for monitoring the apps running on marathon. Inspired from [kubernetes-alerts](https://github.com/AcalephStorage/kubernetes-alerts) and [consul-alerts](https://github.com/AcalephStorage/consul-alerts).
 
+This was initially built for Marathon 0.8.0, hence we don't use the event bus.
+
 ## Usage
 ```
 $ marathon-alerts --help

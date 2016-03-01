@@ -26,6 +26,8 @@ func (n *MinHealthyTasks) Name() string {
 }
 
 func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
+	failThreshold := GetFloat32(app.Labels, "alerts.min-healthy.fail.threshold", n.DefaultFailThreshold)
+	warnThreshold := GetFloat32(app.Labels, "alerts.min-healthy.warn.threshold", n.DefaultWarningThreshold)
 	result := Pass
 	currentlyRunning := float32(app.TasksHealthy)
 	message := fmt.Sprintf("Only %d are healthy out of total %d", int(currentlyRunning), app.Instances)
@@ -33,9 +35,9 @@ func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
 
 	if currentlyRunning == 0.0 && app.Instances > 0 {
 		result = Fail
-	} else if currentlyRunning > 0.0 && currentlyRunning < n.DefaultFailThreshold*float32(app.Instances) {
+	} else if currentlyRunning > 0.0 && currentlyRunning < failThreshold*float32(app.Instances) {
 		result = Fail
-	} else if currentlyRunning < n.DefaultWarningThreshold*float32(app.Instances) {
+	} else if currentlyRunning < warnThreshold*float32(app.Instances) {
 		result = Warning
 	} else {
 		message = fmt.Sprintf("We now have %d healthy out of total %d", app.TasksHealthy, app.Instances)

@@ -71,7 +71,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 		delete(a.AppSuppress, keyIfCheckExists)
 		key := a.key(check, check.Result)
 		a.AppSuppress[key] = time.Now()
-	} else if !checkExists {
+	} else if !checkExists && check.Result != Pass {
 		a.NotifierChan <- check
 		key := a.key(check, check.Result)
 		a.AppSuppress[key] = time.Now()

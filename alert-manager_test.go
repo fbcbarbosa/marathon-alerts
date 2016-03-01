@@ -59,6 +59,30 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 	testWG.Wait()
 }
 
+func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
+	notifierChannel := make(chan AppCheck)
+	suppressedApps := make(map[string]time.Time)
+	check := AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    Pass,
+	}
+	mgr := AlertManager{
+		AppSuppress:  suppressedApps,
+		NotifierChan: notifierChannel,
+	}
+
+	assertCalled := false
+	appCheckAssertion := func(t *testing.T, check AppCheck) {
+		assertCalled = true
+	}
+
+	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
+	mgr.processCheck(check)
+	testWG.Wait()
+	assert.False(t, assertCalled)
+}
+
 func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	notifierChannel := make(chan AppCheck)
 	suppressedApps := make(map[string]time.Time)

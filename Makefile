@@ -29,6 +29,3 @@ test-only:
 
 test:
 	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/
-
-test-ci:
-	make test TESTFLAGS="-v -race"

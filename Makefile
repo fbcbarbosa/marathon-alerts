@@ -1,5 +1,6 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
+TESTFLAGS=-v
 
 build:
 	go build -o ${APPNAME} .
@@ -24,7 +25,10 @@ setup:
 	go get -u github.com/stretchr/testify/assert
 
 test-only:
-	go test github.com/ashwanthkumar/marathon-alerts/${name}
+	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/${name}
 
 test:
-	go test github.com/ashwanthkumar/marathon-alerts/
+	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/
+
+test-ci:
+	make test TESTFLAGS="-v -race"

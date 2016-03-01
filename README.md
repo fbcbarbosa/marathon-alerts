@@ -25,6 +25,22 @@ $ marathon-alerts --uri http://marathon1:8080,marathon2:8080 \
                   --slack-owner ashwanthkumar,slackbot
 ```
 
+## Releases
+Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).
+
+## Building
+To build from source, clone the repo:
+
+```
+$ cd $GOPATH
+$ mkdir -p github.com/ashwanthkumar/
+$ git clone https://github.com/ashwanthkumar/marathon-alerts.git github.com/ashwanthkumar/
+$ cd github.com/ashwanthkumar/marathon-alerts
+$ make setup  # Downloads the required dependencies
+$ make test   # Runs the test
+$ make build  # Builds the distribution specific binary
+```
+
 ## Available Checks
 - [x] `min-healthy` - Minimum % of Task instances should be healthy else this check is fired.
 

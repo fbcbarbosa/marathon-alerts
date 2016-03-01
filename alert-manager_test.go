@@ -54,7 +54,7 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 		assert.Equal(t, Warning, check.Result)
 	}
 
-	testWG := AssertOnChannel(t, notifierChannel, 1*time.Second, appCheckAssertion)
+	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
 	testWG.Wait()
 }
@@ -81,7 +81,7 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 		assertCalled = true
 	}
 
-	testWG := AssertOnChannel(t, notifierChannel, 1*time.Second, appCheckAssertion)
+	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
 	testWG.Wait()
 	assert.True(t, assertCalled)
@@ -106,7 +106,7 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 		assertCalled = true
 	}
 
-	testWG := AssertOnChannel(t, notifierChannel, 1*time.Second, appCheckAssertion)
+	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
 	testWG.Wait()
 

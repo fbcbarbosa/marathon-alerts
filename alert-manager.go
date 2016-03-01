@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -61,23 +62,36 @@ func (a *AlertManager) run() {
 
 func (a *AlertManager) processCheck(check AppCheck) {
 	a.supressMutex.Lock()
+	defer a.supressMutex.Unlock()
 
-	checkExists, keyIfCheckExists, levelIfCheckExists := a.checkExist(check)
-
-	if checkExists && check.Result == Pass {
-		a.NotifierChan <- check
-		delete(a.AppSuppress, keyIfCheckExists)
-	} else if checkExists && check.Result != levelIfCheckExists {
-		a.NotifierChan <- check
-		delete(a.AppSuppress, keyIfCheckExists)
-		key := a.key(check, check.Result)
-		a.AppSuppress[key] = time.Now()
-	} else if !checkExists && check.Result != Pass {
-		a.NotifierChan <- check
-		key := a.key(check, check.Result)
-		a.AppSuppress[key] = time.Now()
+	alertEnabled := true
+	enabledString, present := check.Labels["alerts.enabled"]
+	if present {
+		parsed, err := strconv.ParseBool(enabledString)
+		if err == nil {
+			alertEnabled = parsed
+		}
 	}
-	a.supressMutex.Unlock()
+
+	if alertEnabled {
+		checkExists, keyIfCheckExists, levelIfCheckExists := a.checkExist(check)
+
+		if checkExists && check.Result == Pass {
+			a.NotifierChan <- check
+			delete(a.AppSuppress, keyIfCheckExists)
+		} else if checkExists && check.Result != levelIfCheckExists {
+			a.NotifierChan <- check
+			delete(a.AppSuppress, keyIfCheckExists)
+			key := a.key(check, check.Result)
+			a.AppSuppress[key] = time.Now()
+		} else if !checkExists && check.Result != Pass {
+			a.NotifierChan <- check
+			key := a.key(check, check.Result)
+			a.AppSuppress[key] = time.Now()
+		}
+	} else {
+		fmt.Printf("Monitoring disabled for %s via alerts.enabled label in app config\n", check.App)
+	}
 }
 
 func (a *AlertManager) checkExist(check AppCheck) (bool, string, CheckStatus) {

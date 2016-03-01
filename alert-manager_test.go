@@ -137,6 +137,33 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 	assert.False(t, assertCalled)
 }
 
+func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
+	notifierChannel := make(chan AppCheck)
+	suppressedApps := make(map[string]time.Time)
+	appLabels := make(map[string]string)
+	appLabels["alerts.enabled"] = "false"
+	check := AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    Warning,
+		Labels:    appLabels,
+	}
+	mgr := AlertManager{
+		AppSuppress:  suppressedApps,
+		NotifierChan: notifierChannel,
+	}
+
+	assertCalled := false
+	appCheckAssertion := func(t *testing.T, check AppCheck) {
+		assertCalled = true
+	}
+
+	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
+	mgr.processCheck(check)
+	testWG.Wait()
+	assert.False(t, assertCalled)
+}
+
 func AssertOnChannel(t *testing.T, channel chan AppCheck, timeout time.Duration, assert func(*testing.T, AppCheck)) sync.WaitGroup {
 	var wg sync.WaitGroup
 	go func(t *testing.T, channel chan AppCheck, wg sync.WaitGroup, timeout time.Duration, assert func(*testing.T, AppCheck)) {

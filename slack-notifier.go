@@ -23,7 +23,7 @@ func (s *Slack) Notify(check AppCheck) {
 		AddField(slack.Field{Title: "Check", Value: check.CheckName, Short: true}).
 		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true})
 
-	destination := GetString(check.Labels, "alerts.slack.destination", s.Channel)
+	destination := GetString(check.Labels, "alerts.slack.channel", s.Channel)
 
 	mainText := ""
 	owners := strings.Split(GetString(check.Labels, "alerts.slack.owners", s.Owners), ",")

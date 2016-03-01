@@ -32,6 +32,8 @@ Apart from the flags that are used while starting up, the functionality can be c
 | Property  | Description  |  Example  |
 |  ---    |   ---      |  ---    |
 | alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
+| alerts.min-healthy.fail.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-fail-threshold` | 0.5 |
+| alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
 
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).

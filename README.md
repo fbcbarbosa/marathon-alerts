@@ -1,3 +1,4 @@
+[![Build Status](https://snap-ci.com/ashwanthkumar/marathon-alerts/branch/master/build_image)](https://snap-ci.com/ashwanthkumar/marathon-alerts/branch/master)
 # marathon-alerts
 
 Marathon Alerts is a tool for monitoring the apps running on marathon. Inspired from [kubernetes-alerts](https://github.com/AcalephStorage/kubernetes-alerts) and [consul-alerts](https://github.com/AcalephStorage/consul-alerts).

@@ -10,7 +10,7 @@ import (
 type Slack struct {
 	Webhook string
 	Channel string
-	Owners  []string
+	Owners  string
 }
 
 func (s *Slack) Notify(check AppCheck) {
@@ -23,14 +23,12 @@ func (s *Slack) Notify(check AppCheck) {
 		AddField(slack.Field{Title: "Check", Value: check.CheckName, Short: true}).
 		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true})
 
-	var destination string
-	if s.Channel != "" {
-		destination = s.Channel
-	}
+	destination := GetString(check.Labels, "alerts.slack.destination", s.Channel)
 
 	mainText := ""
-	if s.Owners != nil && len(s.Owners) > 0 {
-		mainText = mainText + "Hey " + s.parseOwners(s.Owners) + ", Please check!"
+	owners := strings.Split(GetString(check.Labels, "alerts.slack.owners", s.Owners), ",")
+	if owners != nil && len(owners) > 0 {
+		mainText = mainText + "Hey " + s.parseOwners(owners) + ", Please check!"
 	}
 
 	payload := slack.Payload(mainText,
@@ -39,9 +37,13 @@ func (s *Slack) Notify(check AppCheck) {
 		destination,
 		[]slack.Attachment{attachment})
 
-	err := slack.Send(s.Webhook, payload)
-	if err != nil {
-		fmt.Printf("Unexpected Error - %v", err)
+	webhooks := strings.Split(GetString(check.Labels, "alerts.slack.webhook", s.Webhook), ",")
+
+	for _, webhook := range webhooks {
+		err := slack.Send(webhook, payload)
+		if err != nil {
+			fmt.Printf("Unexpected Error - %v", err)
+		}
 	}
 }
 

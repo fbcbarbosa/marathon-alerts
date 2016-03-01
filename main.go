@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	flag "github.com/spf13/pflag"
@@ -26,7 +25,7 @@ var checkInterval time.Duration
 var alertSuppressDuration time.Duration
 
 // Slack flags
-var slackWebhooks []string
+var slackWebhooks string
 var slackChannel string
 var slackOwners string
 
@@ -59,20 +58,13 @@ func main() {
 	}
 	alertManager.Start()
 
-	slackOwners := strings.Split(slackOwners, ",")
-	if len(slackOwners) < 1 {
-		slackOwners = []string{}
-	}
-
 	var notifiers []Notifier
-	for _, slackTeam := range slackWebhooks {
-		slack := Slack{
-			Webhook: slackTeam,
-			Channel: slackChannel,
-			Owners:  slackOwners,
-		}
-		notifiers = append(notifiers, &slack)
+	slack := Slack{
+		Webhook: slackWebhooks,
+		Channel: slackChannel,
+		Owners:  slackOwners,
 	}
+	notifiers = append(notifiers, &slack)
 	notifyManager = NotifyManager{
 		AlertChan: alertManager.NotifierChan,
 		Notifiers: notifiers,
@@ -103,7 +95,7 @@ func defineFlags() {
 	flag.Float32Var(&minHealthyFailThreshold, "check-min-healthy-fail-threshold", 0.6, "Min instances check fail threshold")
 
 	// Slack flags
-	flag.StringSliceVar(&slackWebhooks, "slack-webhooks", []string{}, "Slack webhook to post the alert")
+	flag.StringVar(&slackWebhooks, "slack-webhooks", "", "Comma list of Slack webhooks to post the alert")
 	flag.StringVar(&slackChannel, "slack-channel", "", "#Channel / @User to post the alert (defaults to webhook configuration)")
 	flag.StringVar(&slackOwners, "slack-owner", "", "Comma list of owners who should be alerted on the post")
 }

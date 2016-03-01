@@ -95,7 +95,7 @@ func defineFlags() {
 	flag.Float32Var(&minHealthyFailThreshold, "check-min-healthy-fail-threshold", 0.6, "Min instances check fail threshold")
 
 	// Slack flags
-	flag.StringVar(&slackWebhooks, "slack-webhooks", "", "Comma list of Slack webhooks to post the alert")
+	flag.StringVar(&slackWebhooks, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")
 	flag.StringVar(&slackChannel, "slack-channel", "", "#Channel / @User to post the alert (defaults to webhook configuration)")
 	flag.StringVar(&slackOwners, "slack-owner", "", "Comma list of owners who should be alerted on the post")
 }

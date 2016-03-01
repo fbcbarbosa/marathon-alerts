@@ -9,14 +9,14 @@ This was initially built for Marathon 0.8.0, hence we don't use the event bus.
 ```
 $ marathon-alerts --help
 Usage of marathon-alerts:
-      --alerts-suppress-duration duration           Suppress alerts for this duration once notified (default 30m0s)
-      --check-interval duration                     Check runs periodically on this interval (default 30s)
-      --check-min-healthy-fail-threshold value      Min instances check fail threshold (default 0.6)
-      --check-min-healthy-warning-threshold value   Min instances check warning threshold (default 0.8)
-      --slack-channel string                        #Channel / @User to post the alert (defaults to webhook configuration)
-      --slack-owner string                          Comma list of owners who should be alerted on the post
-      --slack-webhooks value                        Slack webhook to post the alert (default [])
-      --uri string                                  Marathon URI to connect
+      --alerts-suppress-duration duration        Suppress alerts for this duration once notified (default 30m0s)
+      --check-interval duration                  Check runs periodically on this interval (default 30s)
+      --check-min-healthy-fail-threshold value   Min instances check fail threshold (default 0.6)
+      --check-min-healthy-warn-threshold value   Min instances check warning threshold (default 0.8)
+      --slack-channel string                     #Channel / @User to post the alert (defaults to webhook configuration)
+      --slack-owner string                       Comma list of owners who should be alerted on the post
+      --slack-webhooks value                     Slack webhook to post the alert (default [])
+      --uri string                               Marathon URI to connect
 ```
 
 Example invocation would be like the following

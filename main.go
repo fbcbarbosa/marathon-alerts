@@ -48,7 +48,7 @@ func main() {
 
 	appChecker = AppChecker{
 		Client:        client,
-		CheckInterval: 2 * time.Second,
+		CheckInterval: checkInterval,
 		Checks:        checks,
 	}
 	appChecker.Start()

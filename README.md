@@ -15,7 +15,7 @@ Usage of marathon-alerts:
       --check-min-healthy-warn-threshold value   Min instances check warning threshold (default 0.8)
       --slack-channel string                     #Channel / @User to post the alert (defaults to webhook configuration)
       --slack-owner string                       Comma list of owners who should be alerted on the post
-      --slack-webhooks value                     Slack webhook to post the alert (default [])
+      --slack-webhooks string                    Comma list of Slack webhooks to post the alert
       --uri string                               Marathon URI to connect
 ```
 

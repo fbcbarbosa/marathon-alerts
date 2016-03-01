@@ -1,2 +1,5 @@
 marathon-alerts
 marathon-alerts-*
+.DS_Store
+vendor/
+

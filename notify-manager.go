@@ -24,6 +24,7 @@ func (n *NotifyManager) Start() {
 	n.RunWaitGroup.Add(1)
 	n.stopChannel = make(chan bool)
 	go n.run()
+	fmt.Println("Notify Manager Started.")
 }
 
 func (n *NotifyManager) Stop() {

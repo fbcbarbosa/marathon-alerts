@@ -35,6 +35,8 @@ func (a *AppChecker) Start() {
 	a.stopChannel = make(chan bool)
 	a.AlertsChannel = make(chan AppCheck)
 	go a.run()
+	fmt.Println("App Checker Started.")
+	fmt.Printf("App Checker - Checking the status of all the apps every %v\n", a.CheckInterval)
 }
 
 func (a *AppChecker) Stop() {
@@ -60,7 +62,6 @@ func (a *AppChecker) run() {
 }
 
 func (a *AppChecker) processChecks() error {
-	println("checking all the apps")
 	apps, err := a.Client.Applications(nil)
 	if err != nil {
 		return err

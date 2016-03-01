@@ -26,6 +26,7 @@ func (a *AlertManager) Start() {
 	a.NotifierChan = make(chan AppCheck)
 	a.AppSuppress = make(map[string]time.Time)
 	go a.run()
+	fmt.Println("Alert Manager Started.")
 }
 
 func (a *AlertManager) Stop() {
@@ -75,10 +76,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 		a.NotifierChan <- check
 		key := a.key(check, check.Result)
 		a.AppSuppress[key] = time.Now()
-	} else {
-		// same check of same level - ignore until cleanUpSupressedAlerts cleans the existing check
 	}
-
 	a.supressMutex.Unlock()
 }
 

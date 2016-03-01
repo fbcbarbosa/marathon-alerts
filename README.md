@@ -26,6 +26,13 @@ $ marathon-alerts --uri http://marathon1:8080,marathon2:8080 \
                   --slack-owner ashwanthkumar,slackbot
 ```
 
+## App Labels
+Apart from the flags that are used while starting up, the functionality can be controlled at an app level using labels in the app specification. The following table explains the properties and it's usage.
+
+| Property  | Description  |  Example  |
+|  :---:    |   :---:      |  :---:    |
+| alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
+
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).
 

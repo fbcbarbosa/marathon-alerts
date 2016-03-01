@@ -60,34 +60,40 @@ func (a *AlertManager) run() {
 
 func (a *AlertManager) processCheck(check AppCheck) {
 	a.supressMutex.Lock()
-	// TODO - Fix this - WE need to send a notification on Pass if we earlier had failed
-	if check.Result != Pass {
-		fmt.Printf("%s has failed %s check\n", check.App, check.CheckName)
-		keyPrefix := fmt.Sprintf("%s-%s", check.App, check.CheckName)
-		suppressed, lastKnownLevel := a.isCheckSuppressed(check, keyPrefix)
 
-		if !suppressed {
-			a.NotifierChan <- check
-			key := fmt.Sprintf("%s-%s", keyPrefix, lastKnownLevel)
-			delete(a.AppSuppress, key)
-			key = fmt.Sprintf("%s-%s", keyPrefix, check.Result)
-			a.AppSuppress[key] = time.Now()
-		}
+	checkExists, keyIfCheckExists, levelIfCheckExists := a.checkExist(check)
+
+	if checkExists && check.Result == Pass {
+		a.NotifierChan <- check
+		delete(a.AppSuppress, keyIfCheckExists)
+	} else if checkExists && check.Result != levelIfCheckExists {
+		a.NotifierChan <- check
+		delete(a.AppSuppress, keyIfCheckExists)
+		key := a.key(check, check.Result)
+		a.AppSuppress[key] = time.Now()
+	} else if !checkExists {
+		a.NotifierChan <- check
+		key := a.key(check, check.Result)
+		a.AppSuppress[key] = time.Now()
+	} else {
+		// same check of same level - ignore until cleanUpSupressedAlerts cleans the existing check
 	}
+
 	a.supressMutex.Unlock()
 }
 
-func (a *AlertManager) isCheckSuppressed(check AppCheck, keyPrefix string) (bool, CheckStatus) {
+func (a *AlertManager) checkExist(check AppCheck) (bool, string, CheckStatus) {
 	for _, level := range CheckLevels {
-		key := fmt.Sprintf("%s-%s", keyPrefix, level)
-		lastNoticiedTime, present := a.AppSuppress[key]
-		if present && check.Result != level {
-			return false, level
-		} else if present && check.Result == level {
-			suppressed := time.Now().Sub(lastNoticiedTime) < a.SuppressDuration
-			return suppressed, level
+		key := a.key(check, level)
+		_, present := a.AppSuppress[key]
+		if present {
+			return true, key, level
 		}
 	}
 
-	return false, check.Result
+	return false, "", Pass
+}
+
+func (a *AlertManager) key(check AppCheck, level CheckStatus) string {
+	return fmt.Sprintf("%s-%s-%d", check.App, check.CheckName, level)
 }

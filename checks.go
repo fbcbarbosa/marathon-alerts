@@ -17,8 +17,8 @@ type Checker interface {
 type MinHealthyTasks struct {
 	// DefaultWarningThreshold - overriden using alerts.min-instances.warning
 	DefaultWarningThreshold float32
-	// DefaultFailThreshold - overriden using alerts.min-instances.fail
-	DefaultFailThreshold float32
+	// DefaultCriticalThreshold - overriden using alerts.min-instances.fail
+	DefaultCriticalThreshold float32
 }
 
 func (n *MinHealthyTasks) Name() string {
@@ -26,7 +26,7 @@ func (n *MinHealthyTasks) Name() string {
 }
 
 func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
-	failThreshold := GetFloat32(app.Labels, "alerts.min-healthy.fail.threshold", n.DefaultFailThreshold)
+	failThreshold := GetFloat32(app.Labels, "alerts.min-healthy.critical.threshold", n.DefaultCriticalThreshold)
 	warnThreshold := GetFloat32(app.Labels, "alerts.min-healthy.warn.threshold", n.DefaultWarningThreshold)
 	result := Pass
 	currentlyRunning := float32(app.TasksHealthy)

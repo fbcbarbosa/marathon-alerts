@@ -11,8 +11,8 @@ $ marathon-alerts --help
 Usage of marathon-alerts:
       --alerts-suppress-duration duration        Suppress alerts for this duration once notified (default 30m0s)
       --check-interval duration                  Check runs periodically on this interval (default 30s)
-      --check-min-healthy-fail-threshold value   Min instances check fail threshold (default 0.6)
-      --check-min-healthy-warn-threshold value   Min instances check warning threshold (default 0.8)
+      --check-min-healthy-critical-threshold value   Min instances check critical threshold (default 0.5)
+      --check-min-healthy-warn-threshold value   Min instances check warning threshold (default 0.75)
       --slack-channel string                     #Channel / @User to post the alert (defaults to webhook configuration)
       --slack-owner string                       Comma list of owners who should be alerted on the post
       --slack-webhook string                     Comma list of Slack webhooks to post the alert
@@ -32,7 +32,7 @@ Apart from the flags that are used while starting up, the functionality can be c
 | Property  | Description  |  Example  |
 |  ---    |   ---      |  ---    |
 | alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
-| alerts.min-healthy.fail.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-fail-threshold` | 0.5 |
+| alerts.min-healthy.critical.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-critical-threshold` | 0.5 |
 | alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
 | alerts.slack.webhook  | Comma separated list of Slack webhooks to send slack notifications. Overrides - `--slack-webhook` | http://hooks.slack.com/.../ |
 | alerts.slack.channel  | #Channel / @User to post the alert into. Overrides - `--slack-channel`  | z_development |

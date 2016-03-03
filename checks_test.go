@@ -9,8 +9,8 @@ import (
 
 func TestMinHealthyTasksWhenEverythingIsFine(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.5,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.5,
+		DefaultWarningThreshold:  0.6,
 	}
 	app := marathon.Application{
 		ID:           "/foo",
@@ -27,8 +27,8 @@ func TestMinHealthyTasksWhenEverythingIsFine(t *testing.T) {
 
 func TestMinHealthyTasksWhenWarningThresholdIsMet(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.5,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.5,
+		DefaultWarningThreshold:  0.6,
 	}
 	app := marathon.Application{
 		ID:           "/foo",
@@ -45,8 +45,8 @@ func TestMinHealthyTasksWhenWarningThresholdIsMet(t *testing.T) {
 
 func TestMinHealthyTasksWhenWarningThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.4,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.4,
+		DefaultWarningThreshold:  0.6,
 	}
 	appLabels := make(map[string]string)
 	appLabels["alerts.min-healthy.warn.threshold"] = "0.5"
@@ -66,8 +66,8 @@ func TestMinHealthyTasksWhenWarningThresholdIsMetButOverridenFromAppLabels(t *te
 
 func TestMinHealthyTasksWhenFailThresholdIsMet(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.5,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.5,
+		DefaultWarningThreshold:  0.6,
 	}
 	app := marathon.Application{
 		ID:           "/foo",
@@ -84,11 +84,11 @@ func TestMinHealthyTasksWhenFailThresholdIsMet(t *testing.T) {
 
 func TestMinHealthyTasksWhenFailThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.5,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.5,
+		DefaultWarningThreshold:  0.6,
 	}
 	appLabels := make(map[string]string)
-	appLabels["alerts.min-healthy.fail.threshold"] = "0.4"
+	appLabels["alerts.min-healthy.critical.threshold"] = "0.4"
 	app := marathon.Application{
 		ID:           "/foo",
 		Instances:    100,
@@ -105,8 +105,8 @@ func TestMinHealthyTasksWhenFailThresholdIsMetButOverridenFromAppLabels(t *testi
 
 func TestMinHealthyTasksWhenNoTasksAreRunning(t *testing.T) {
 	check := MinHealthyTasks{
-		DefaultFailThreshold:    0.5,
-		DefaultWarningThreshold: 0.6,
+		DefaultCriticalThreshold: 0.5,
+		DefaultWarningThreshold:  0.6,
 	}
 	app := marathon.Application{
 		ID:           "/foo",

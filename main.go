@@ -19,7 +19,7 @@ var notifyManager NotifyManager
 
 // Check settings
 var minHealthyWarningThreshold float32
-var minHealthyFailThreshold float32
+var minHealthyCriticalThreshold float32
 
 // Required flags
 var marathonURI string
@@ -50,8 +50,8 @@ func main() {
 	}
 
 	minHealthyTasks := &MinHealthyTasks{
-		DefaultFailThreshold:    minHealthyFailThreshold,
-		DefaultWarningThreshold: minHealthyWarningThreshold,
+		DefaultCriticalThreshold: minHealthyCriticalThreshold,
+		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
 	checks := []Checker{minHealthyTasks}
 
@@ -102,8 +102,8 @@ func defineFlags() {
 	flag.DurationVar(&alertSuppressDuration, "alerts-suppress-duration", 30*time.Minute, "Suppress alerts for this duration once notified")
 
 	// Check flags
-	flag.Float32Var(&minHealthyWarningThreshold, "check-min-healthy-warn-threshold", 0.8, "Min instances check warning threshold")
-	flag.Float32Var(&minHealthyFailThreshold, "check-min-healthy-fail-threshold", 0.6, "Min instances check fail threshold")
+	flag.Float32Var(&minHealthyWarningThreshold, "check-min-healthy-warn-threshold", 0.75, "Min instances check warning threshold")
+	flag.Float32Var(&minHealthyCriticalThreshold, "check-min-healthy-critical-threshold", 0.5, "Min instances check fail threshold")
 
 	// Slack flags
 	flag.StringVar(&slackWebhooks, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")

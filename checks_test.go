@@ -76,7 +76,7 @@ func TestMinHealthyTasksWhenFailThresholdIsMet(t *testing.T) {
 	}
 
 	appCheck := check.Check(app)
-	assert.Equal(t, Fail, appCheck.Result)
+	assert.Equal(t, Critical, appCheck.Result)
 	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 49 are healthy out of total 100", appCheck.Message)
@@ -115,7 +115,7 @@ func TestMinHealthyTasksWhenNoTasksAreRunning(t *testing.T) {
 	}
 
 	appCheck := check.Check(app)
-	assert.Equal(t, Fail, appCheck.Result)
+	assert.Equal(t, Critical, appCheck.Result)
 	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 0 are healthy out of total 1", appCheck.Message)

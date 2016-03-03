@@ -62,7 +62,7 @@ func (s *Slack) resultToColor(check AppCheck) *string {
 		color = "good"
 	case Warning:
 		color = "warning"
-	case Fail:
+	case Critical:
 		color = "danger"
 	}
 
@@ -76,7 +76,7 @@ func (s *Slack) resultToString(check AppCheck) string {
 		value = "Passed"
 	case Warning:
 		value = "Warning"
-	case Fail:
+	case Critical:
 		value = "Failed"
 	}
 

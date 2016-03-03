@@ -34,9 +34,9 @@ func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
 	// fmt.Printf("%s has %f healthy instances running out of %d\n", app.ID, currentlyRunning, app.Instances)
 
 	if currentlyRunning == 0.0 && app.Instances > 0 {
-		result = Fail
+		result = Critical
 	} else if currentlyRunning > 0.0 && currentlyRunning < failThreshold*float32(app.Instances) {
-		result = Fail
+		result = Critical
 	} else if currentlyRunning < warnThreshold*float32(app.Instances) {
 		result = Warning
 	} else {

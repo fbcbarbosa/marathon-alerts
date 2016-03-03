@@ -90,7 +90,7 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	check := AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Fail,
+		Result:    Critical,
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
@@ -101,7 +101,7 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	appCheckAssertion := func(t *testing.T, check AppCheck) {
 		assert.Equal(t, "/foo", check.App)
 		assert.Equal(t, "check-name", check.CheckName)
-		assert.Equal(t, Fail, check.Result)
+		assert.Equal(t, Critical, check.Result)
 		assertCalled = true
 	}
 

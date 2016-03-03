@@ -12,12 +12,12 @@ import (
 type CheckStatus uint8
 
 const (
-	Pass    = CheckStatus(99)
-	Warning = CheckStatus(2)
-	Fail    = CheckStatus(1)
+	Pass     = CheckStatus(99)
+	Warning  = CheckStatus(2)
+	Critical = CheckStatus(1)
 )
 
-var CheckLevels = [...]CheckStatus{Warning, Fail}
+var CheckLevels = [...]CheckStatus{Warning, Critical}
 
 type AppChecker struct {
 	Client        marathon.Marathon

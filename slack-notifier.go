@@ -25,7 +25,6 @@ func (s *Slack) Notify(check AppCheck) {
 
 	destination := GetString(check.Labels, "alerts.slack.channel", s.Channel)
 
-	mainText := ""
 	appSpecificOwners := GetString(check.Labels, "alerts.slack.owners", s.Owners)
 	var owners []string
 	if appSpecificOwners != "" {
@@ -33,7 +32,12 @@ func (s *Slack) Notify(check AppCheck) {
 	} else {
 		owners = []string{"@here"}
 	}
-	mainText = mainText + s.parseOwners(owners) + ", Please check!"
+
+	alertSuffix := "Please check!"
+	if check.Result == Pass {
+		alertSuffix = "Check Resolved, thanks!"
+	}
+	mainText := fmt.Sprintf("%s, %s", s.parseOwners(owners), alertSuffix)
 
 	payload := slack.Payload(mainText,
 		"marathon-alerts",

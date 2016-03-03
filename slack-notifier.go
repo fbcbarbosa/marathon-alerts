@@ -26,10 +26,14 @@ func (s *Slack) Notify(check AppCheck) {
 	destination := GetString(check.Labels, "alerts.slack.channel", s.Channel)
 
 	mainText := ""
-	owners := strings.Split(GetString(check.Labels, "alerts.slack.owners", s.Owners), ",")
-	if owners != nil && len(owners) > 0 {
-		mainText = mainText + "Hey " + s.parseOwners(owners) + ", Please check!"
+	appSpecificOwners := GetString(check.Labels, "alerts.slack.owners", s.Owners)
+	var owners []string
+	if appSpecificOwners != "" {
+		owners = strings.Split(appSpecificOwners, ",")
+	} else {
+		owners = []string{"@here"}
 	}
+	mainText = mainText + s.parseOwners(owners) + ", Please check!"
 
 	payload := slack.Payload(mainText,
 		"marathon-alerts",

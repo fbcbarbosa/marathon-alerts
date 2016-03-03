@@ -26,6 +26,13 @@ type AppChecker struct {
 	stopChannel   chan bool
 	Checks        []Checker
 	AlertsChannel chan AppCheck
+	// Snooze the entire system for some Time
+	// Useful if we don't want to SPAM the notifications
+	// when doing maintenance of mesos cluster
+	// TODO - Enable this feature via API endpoint
+	IsSnoozed  bool
+	SnoozedAt  time.Time
+	SnoozedFor time.Duration
 }
 
 func (a *AppChecker) Start() {
@@ -33,6 +40,9 @@ func (a *AppChecker) Start() {
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
 	a.AlertsChannel = make(chan AppCheck)
+
+	a.IsSnoozed = false
+
 	go a.run()
 	fmt.Println("App Checker Started.")
 	fmt.Printf("App Checker - Checking the status of all the apps every %v\n", a.CheckInterval)

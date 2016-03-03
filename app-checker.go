@@ -20,12 +20,11 @@ const (
 var CheckLevels = [...]CheckStatus{Warning, Fail}
 
 type AppChecker struct {
-	Client        marathon.Marathon // client to access the marathon instance
+	Client        marathon.Marathon
 	RunWaitGroup  sync.WaitGroup
-	CheckInterval time.Duration // --poll-interval
+	CheckInterval time.Duration
 	stopChannel   chan bool
 	Checks        []Checker
-	// NB: move thhis to notifier // Supress       time.Duration // --supress-duration
 	AlertsChannel chan AppCheck
 }
 

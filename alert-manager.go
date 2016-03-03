@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 )
+
+const AlertsEnabledLabel = "alerts.enabled"
 
 type AlertManager struct {
 	// channel to get app check results
@@ -64,14 +65,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 	a.supressMutex.Lock()
 	defer a.supressMutex.Unlock()
 
-	alertEnabled := true
-	enabledString, present := check.Labels["alerts.enabled"]
-	if present {
-		parsed, err := strconv.ParseBool(enabledString)
-		if err == nil {
-			alertEnabled = parsed
-		}
-	}
+	alertEnabled := GetBoolean(check.Labels, AlertsEnabledLabel, true)
 
 	if alertEnabled {
 		checkExists, keyIfCheckExists, levelIfCheckExists := a.checkExist(check)

@@ -82,7 +82,10 @@ func (s *Slack) resultToString(check AppCheck) string {
 func (s *Slack) parseOwners(owners []string) string {
 	parsedOwners := []string{}
 	for _, owner := range owners {
-		parsedOwners = append(parsedOwners, fmt.Sprintf("@%s", owner))
+		if owner != "@here" {
+			owner = fmt.Sprintf("@%s", owner)
+		}
+		parsedOwners = append(parsedOwners, owner)
 	}
 
 	return strings.Join(parsedOwners, ", ")

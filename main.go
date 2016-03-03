@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -28,11 +30,19 @@ var alertSuppressDuration time.Duration
 var slackWebhooks string
 var slackChannel string
 var slackOwners string
+var pidFile string
 
 func main() {
 	os.Args[0] = "marathon-alerts"
 	defineFlags()
 	flag.Parse()
+	pid := []byte(fmt.Sprintf("%d\n", os.Getpid()))
+	err := ioutil.WriteFile(pidFile, pid, 0644)
+	if err != nil {
+		fmt.Println("Unable to write pid file. ")
+		log.Fatalf("Error - %v\n", err)
+	}
+
 	client, err := marathonClient(marathonURI)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -87,6 +97,7 @@ func marathonClient(uri string) (marathon.Marathon, error) {
 
 func defineFlags() {
 	flag.StringVar(&marathonURI, "uri", "", "Marathon URI to connect")
+	flag.StringVar(&pidFile, "pid", "PID", "File to write PID file")
 	flag.DurationVar(&checkInterval, "check-interval", 30*time.Second, "Check runs periodically on this interval")
 	flag.DurationVar(&alertSuppressDuration, "alerts-suppress-duration", 30*time.Minute, "Suppress alerts for this duration once notified")
 

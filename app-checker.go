@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/ashwanthkumar/golang-utils/sets"
 	marathon "github.com/gambol99/go-marathon"
+)
+
+const (
+	CheckSubscriptionLabel = "alerts.checks.subscribe"
+	SubscribeAllChecks     = "all"
 )
 
 type CheckStatus uint8
@@ -76,9 +83,14 @@ func (a *AppChecker) processChecks() error {
 		return err
 	}
 	for _, app := range apps.Apps {
+		checksSubscribed := sets.FromSlice(
+			strings.Split(GetString(app.Labels, CheckSubscriptionLabel, SubscribeAllChecks),
+				","))
 		for _, check := range a.Checks {
-			result := check.Check(app)
-			a.AlertsChannel <- result
+			if checksSubscribed.Contains(check.Name()) || checksSubscribed.Contains(SubscribeAllChecks) {
+				result := check.Check(app)
+				a.AlertsChannel <- result
+			}
 		}
 	}
 

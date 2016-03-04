@@ -24,6 +24,7 @@ setup:
 	go get -u github.com/ashwanthkumar/golang-utils/sets
 	# Test deps
 	go get -u github.com/stretchr/testify/assert
+	go get -u github.com/stretchr/testify/mock
 
 test-only:
 	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/${name}

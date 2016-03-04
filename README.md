@@ -46,9 +46,9 @@ Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/r
 To build from source, clone the repo:
 
 ```
-$ cd $GOPATH
-$ mkdir -p github.com/ashwanthkumar/
-$ git clone https://github.com/ashwanthkumar/marathon-alerts.git github.com/ashwanthkumar/
+$ cd $GOPATH/src
+$ mkdir -p github.com/ashwanthkumar/marathon-alerts
+$ git clone https://github.com/ashwanthkumar/marathon-alerts.git github.com/ashwanthkumar/marathon-alerts
 $ cd github.com/ashwanthkumar/marathon-alerts
 $ make setup  # Downloads the required dependencies
 $ make test   # Runs the test

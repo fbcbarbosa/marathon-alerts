@@ -21,6 +21,7 @@ setup:
 	go get -u github.com/spf13/pflag
 	go get -u github.com/ashwanthkumar/slack-go-webhook
 	go get -u github.com/gambol99/go-marathon
+	go get -u github.com/ashwanthkumar/golang-utils
 	# Test deps
 	go get -u github.com/stretchr/testify/assert
 

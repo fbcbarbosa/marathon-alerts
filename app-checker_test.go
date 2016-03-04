@@ -21,7 +21,7 @@ func TestProcessCheckForAllSubscribers(t *testing.T) {
 	var urlValues url.Values
 	client.On("Applications", urlValues).Return(&apps, nil)
 
-	alertChan := make(chan AppCheck)
+	alertChan := make(chan AppCheck, 1)
 	check, now := CreateMockChecker(appLabels)
 
 	appChecker := AppChecker{
@@ -31,12 +31,11 @@ func TestProcessCheckForAllSubscribers(t *testing.T) {
 	}
 
 	expectedCheck := AppCheck{Result: Critical, Timestamp: now, App: "/foo-app", Labels: appLabels}
-	wg := AssertOnChannel(t, alertChan, 5*time.Second, func(t *testing.T, actualData AppCheck) {
-		assert.Equal(t, expectedCheck, actualData)
-	})
 	err := appChecker.processChecks()
 	assert.Nil(t, err)
-	wg.Wait()
+	assert.Len(t, alertChan, 1)
+	actualCheck := <-alertChan
+	assert.Equal(t, actualCheck, expectedCheck)
 }
 
 func TestProcessCheckForWithNoSubscribers(t *testing.T) {

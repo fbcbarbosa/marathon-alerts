@@ -32,6 +32,7 @@ Apart from the flags that are used while starting up, the functionality can be c
 | Property  | Description  |  Example  |
 |  ---    |   ---      |  ---    |
 | alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
+| alerts.checks.subscribe  | Comma separated list of checks that needs to be run. Defaults - all | all |
 | alerts.min-healthy.critical.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-critical-threshold` | 0.5 |
 | alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
 | alerts.slack.webhook  | Comma separated list of Slack webhooks to send slack notifications. Overrides - `--slack-webhook` | http://hooks.slack.com/.../ |

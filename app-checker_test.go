@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/url"
 	"testing"
 	"time"
@@ -48,7 +47,7 @@ func TestProcessCheckForWithNoSubscribers(t *testing.T) {
 	var urlValues url.Values
 	client.On("Applications", urlValues).Return(&apps, nil)
 
-	alertChan := make(chan AppCheck)
+	alertChan := make(chan AppCheck, 1)
 	check, _ := CreateMockChecker(appLabels)
 
 	appChecker := AppChecker{
@@ -57,13 +56,9 @@ func TestProcessCheckForWithNoSubscribers(t *testing.T) {
 		Checks:        []Checker{check},
 	}
 
-	wg := AssertOnChannel(t, alertChan, 5*time.Second, func(t *testing.T, actualData AppCheck) {
-		log.Println("Should not be called")
-		t.FailNow()
-	})
 	err := appChecker.processChecks()
 	assert.Nil(t, err)
-	wg.Wait()
+	assert.Len(t, alertChan, 0)
 }
 
 func CreateMockChecker(appLabels map[string]string) (Checker, time.Time) {

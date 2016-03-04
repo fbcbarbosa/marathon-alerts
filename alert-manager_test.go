@@ -1,7 +1,6 @@
 package main
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -36,7 +35,7 @@ func TestCheckExists(t *testing.T) {
 }
 
 func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	check := AppCheck{
 		App:       "/foo",
@@ -48,19 +47,15 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 		NotifierChan: notifierChannel,
 	}
 
-	appCheckAssertion := func(t *testing.T, check AppCheck) {
-		assert.Equal(t, "/foo", check.App)
-		assert.Equal(t, "check-name", check.CheckName)
-		assert.Equal(t, Warning, check.Result)
-	}
-
-	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
-	testWG.Wait()
+	actualCheck := <-notifierChannel
+	assert.Equal(t, "/foo", actualCheck.App)
+	assert.Equal(t, "check-name", actualCheck.CheckName)
+	assert.Equal(t, Warning, actualCheck.Result)
 }
 
 func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	check := AppCheck{
 		App:       "/foo",
@@ -72,19 +67,12 @@ func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
 		NotifierChan: notifierChannel,
 	}
 
-	assertCalled := false
-	appCheckAssertion := func(t *testing.T, check AppCheck) {
-		assertCalled = true
-	}
-
-	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
-	testWG.Wait()
-	assert.False(t, assertCalled)
+	assert.Len(t, notifierChannel, 0)
 }
 
 func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	check := AppCheck{
@@ -97,22 +85,16 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 		NotifierChan: notifierChannel,
 	}
 
-	assertCalled := false
-	appCheckAssertion := func(t *testing.T, check AppCheck) {
-		assert.Equal(t, "/foo", check.App)
-		assert.Equal(t, "check-name", check.CheckName)
-		assert.Equal(t, Critical, check.Result)
-		assertCalled = true
-	}
-
-	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
-	testWG.Wait()
-	assert.True(t, assertCalled)
+	assert.Len(t, notifierChannel, 1)
+	actualCheck := <-notifierChannel
+	assert.Equal(t, "/foo", actualCheck.App)
+	assert.Equal(t, "check-name", actualCheck.CheckName)
+	assert.Equal(t, Critical, actualCheck.Result)
 }
 
 func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	check := AppCheck{
@@ -125,20 +107,12 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 		NotifierChan: notifierChannel,
 	}
 
-	assertCalled := false
-	appCheckAssertion := func(t *testing.T, check AppCheck) {
-		assertCalled = true
-	}
-
-	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
-	testWG.Wait()
-
-	assert.False(t, assertCalled)
+	assert.Len(t, notifierChannel, 0)
 }
 
 func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	appLabels := make(map[string]string)
 	appLabels["alerts.enabled"] = "false"
@@ -153,36 +127,8 @@ func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
 		NotifierChan: notifierChannel,
 	}
 
-	assertCalled := false
-	appCheckAssertion := func(t *testing.T, check AppCheck) {
-		assertCalled = true
-	}
-
-	testWG := AssertOnChannel(t, notifierChannel, 5*time.Second, appCheckAssertion)
 	mgr.processCheck(check)
-	testWG.Wait()
-	assert.False(t, assertCalled)
-}
-
-func AssertOnChannel(t *testing.T, channel chan AppCheck, timeout time.Duration, assert func(*testing.T, AppCheck)) sync.WaitGroup {
-	var wg sync.WaitGroup
-	go func(t *testing.T, channel chan AppCheck, wg sync.WaitGroup, timeout time.Duration, assert func(*testing.T, AppCheck)) {
-		running := true
-		wg.Add(1)
-		for running {
-			select {
-			case checkToAssert := <-channel:
-				assert(t, checkToAssert)
-				running = false
-				wg.Done()
-			case <-time.After(timeout):
-				running = false
-				wg.Done()
-			}
-		}
-	}(t, channel, wg, timeout, assert)
-
-	return wg
+	assert.Len(t, notifierChannel, 0)
 }
 
 func TestCleanUpSupressedAlerts(t *testing.T) {

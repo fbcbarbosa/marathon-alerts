@@ -31,7 +31,6 @@ func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
 	result := Pass
 	currentlyRunning := float32(app.TasksHealthy)
 	message := fmt.Sprintf("Only %d are healthy out of total %d", int(currentlyRunning), app.Instances)
-	// fmt.Printf("%s has %f healthy instances running out of %d\n", app.ID, currentlyRunning, app.Instances)
 
 	if currentlyRunning == 0.0 && app.Instances > 0 {
 		result = Critical

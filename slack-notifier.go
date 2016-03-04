@@ -48,7 +48,7 @@ func (s *Slack) Notify(check AppCheck) {
 	webhooks := strings.Split(GetString(check.Labels, "alerts.slack.webhook", s.Webhook), ",")
 
 	for _, webhook := range webhooks {
-		err := slack.Send(webhook, payload)
+		err := slack.Send(webhook, "", payload)
 		if err != nil {
 			fmt.Printf("Unexpected Error - %v", err)
 		}

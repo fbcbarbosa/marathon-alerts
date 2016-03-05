@@ -9,4 +9,5 @@ type AppCheck struct {
 	Message   string
 	Timestamp time.Time
 	Labels    map[string]string
+	Times     int
 }

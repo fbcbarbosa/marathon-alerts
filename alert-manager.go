@@ -70,21 +70,23 @@ func (a *AlertManager) processCheck(check AppCheck) {
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
 
 		if checkExists && check.Result == Pass {
-			a.NotifierChan <- check
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
-		} else if checkExists && check.Result != resultIfCheckExists {
 			a.NotifierChan <- check
+		} else if checkExists && check.Result != resultIfCheckExists {
 			delete(a.AppSuppress, keyIfCheckExists)
 			key := a.key(check, check.Result)
-			a.AppSuppress[key] = time.Now()
+			a.AppSuppress[key] = check.Timestamp
 			a.AlertCount[keyPrefixIfCheckExists]++
-		} else if !checkExists && check.Result != Pass {
+			check.Times = a.AlertCount[keyPrefixIfCheckExists]
 			a.NotifierChan <- check
+		} else if !checkExists && check.Result != Pass {
 			keyPrefix := a.keyPrefix(check)
 			key := a.key(check, check.Result)
-			a.AppSuppress[key] = time.Now()
+			a.AppSuppress[key] = check.Timestamp
 			a.AlertCount[keyPrefix] = 1
+			check.Times = a.AlertCount[keyPrefix]
+			a.NotifierChan <- check
 		} else if !checkExists && check.Result == Pass {
 			keyPrefix := a.keyPrefix(check)
 			delete(a.AlertCount, keyPrefix)

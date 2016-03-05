@@ -65,6 +65,7 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
 	assert.Equal(t, Warning, actualCheck.Result)
+	assert.Equal(t, 1, actualCheck.Times)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
@@ -112,6 +113,7 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
 	assert.Equal(t, Critical, actualCheck.Result)
+	assert.Equal(t, 2, actualCheck.Times)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 2)
 }
 

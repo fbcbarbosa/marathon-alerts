@@ -21,7 +21,8 @@ func (s *Slack) Notify(check AppCheck) {
 	attachment.
 		AddField(slack.Field{Title: "App", Value: check.App, Short: true}).
 		AddField(slack.Field{Title: "Check", Value: check.CheckName, Short: true}).
-		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true})
+		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true}).
+		AddField(slack.Field{Title: "Times", Value: fmt.Sprintf("%d", check.Times), Short: true})
 
 	destination := GetString(check.Labels, "alerts.slack.channel", s.Channel)
 

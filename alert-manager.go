@@ -9,12 +9,10 @@ import (
 const AlertsEnabledLabel = "alerts.enabled"
 
 type AlertManager struct {
-	// channel to get app check results
-	CheckerChan chan AppCheck
-	// channel to send app check notifications
-	NotifierChan chan AppCheck
-	// Key - AppName-CheckName-CheckResult
-	AppSuppress      map[string]time.Time
+	CheckerChan      chan AppCheck        // channel to get app check results
+	NotifierChan     chan AppCheck        // channel to send app check notifications
+	AppSuppress      map[string]time.Time // Key - AppName-CheckName-CheckResult
+	AlertCount       map[string]int       // Key - AppName-CheckName -> Consecutive # of failures
 	SuppressDuration time.Duration
 	RunWaitGroup     sync.WaitGroup
 	stopChannel      chan bool
@@ -27,6 +25,7 @@ func (a *AlertManager) Start() {
 	a.stopChannel = make(chan bool)
 	a.NotifierChan = make(chan AppCheck)
 	a.AppSuppress = make(map[string]time.Time)
+	a.AlertCount = make(map[string]int)
 	go a.run()
 	fmt.Println("Alert Manager Started.")
 }
@@ -68,38 +67,50 @@ func (a *AlertManager) processCheck(check AppCheck) {
 	alertEnabled := GetBoolean(check.Labels, AlertsEnabledLabel, true)
 
 	if alertEnabled {
-		checkExists, keyIfCheckExists, levelIfCheckExists := a.checkExist(check)
+		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
 
 		if checkExists && check.Result == Pass {
 			a.NotifierChan <- check
 			delete(a.AppSuppress, keyIfCheckExists)
-		} else if checkExists && check.Result != levelIfCheckExists {
+			delete(a.AlertCount, keyPrefixIfCheckExists)
+		} else if checkExists && check.Result != resultIfCheckExists {
 			a.NotifierChan <- check
 			delete(a.AppSuppress, keyIfCheckExists)
 			key := a.key(check, check.Result)
 			a.AppSuppress[key] = time.Now()
+			a.AlertCount[keyPrefixIfCheckExists]++
 		} else if !checkExists && check.Result != Pass {
 			a.NotifierChan <- check
+			keyPrefix := a.keyPrefix(check)
 			key := a.key(check, check.Result)
 			a.AppSuppress[key] = time.Now()
+			a.AlertCount[keyPrefix] = 1
+		} else if !checkExists && check.Result == Pass {
+			keyPrefix := a.keyPrefix(check)
+			delete(a.AlertCount, keyPrefix)
 		}
 	} else {
 		fmt.Printf("Monitoring disabled for %s via alerts.enabled label in app config\n", check.App)
 	}
 }
 
-func (a *AlertManager) checkExist(check AppCheck) (bool, string, CheckStatus) {
+func (a *AlertManager) checkExist(check AppCheck) (bool, string, string, CheckStatus) {
 	for _, level := range CheckLevels {
+		keyPrefix := a.keyPrefix(check)
 		key := a.key(check, level)
 		_, present := a.AppSuppress[key]
 		if present {
-			return true, key, level
+			return true, keyPrefix, key, level
 		}
 	}
 
-	return false, "", Pass
+	return false, "", "", Pass
 }
 
 func (a *AlertManager) key(check AppCheck, level CheckStatus) string {
-	return fmt.Sprintf("%s-%s-%d", check.App, check.CheckName, level)
+	return fmt.Sprintf("%s-%d", a.keyPrefix(check), level)
+}
+
+func (a *AlertManager) keyPrefix(check AppCheck) string {
+	return fmt.Sprintf("%s-%s", check.App, check.CheckName)
 }

@@ -17,6 +17,16 @@ func TestKey(t *testing.T) {
 	assert.Equal(t, "/foo-check-name-99", key)
 }
 
+func TestKeyPrefix(t *testing.T) {
+	check := AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+	}
+	mgr := AlertManager{}
+	key := mgr.keyPrefix(check)
+	assert.Equal(t, "/foo-check-name", key)
+}
+
 func TestCheckExists(t *testing.T) {
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
@@ -27,9 +37,11 @@ func TestCheckExists(t *testing.T) {
 	}
 	mgr := AlertManager{
 		AppSuppress: suppressedApps,
+		AlertCount:  make(map[string]int),
 	}
-	exist, keyIfExist, checkLevel := mgr.checkExist(check)
+	exist, keyPrefixIfExist, keyIfExist, checkLevel := mgr.checkExist(check)
 	assert.True(t, true, exist)
+	assert.Equal(t, "/foo-check-name", keyPrefixIfExist)
 	assert.Equal(t, "/foo-check-name-2", keyIfExist)
 	assert.Equal(t, Warning, checkLevel)
 }
@@ -44,6 +56,7 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
+		AlertCount:   make(map[string]int),
 		NotifierChan: notifierChannel,
 	}
 
@@ -52,6 +65,7 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
 	assert.Equal(t, Warning, actualCheck.Result)
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
 func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
@@ -62,13 +76,17 @@ func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
 		CheckName: "check-name",
 		Result:    Pass,
 	}
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 2
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
+		AlertCount:   alertCount,
 		NotifierChan: notifierChannel,
 	}
 
 	mgr.processCheck(check)
 	assert.Len(t, notifierChannel, 0)
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
 }
 
 func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
@@ -80,8 +98,11 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 		CheckName: "check-name",
 		Result:    Critical,
 	}
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
+		AlertCount:   alertCount,
 		NotifierChan: notifierChannel,
 	}
 
@@ -91,12 +112,15 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
 	assert.Equal(t, Critical, actualCheck.Result)
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 2)
 }
 
 func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
 	check := AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
@@ -104,11 +128,13 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
+		AlertCount:   alertCount,
 		NotifierChan: notifierChannel,
 	}
 
 	mgr.processCheck(check)
 	assert.Len(t, notifierChannel, 0)
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
 func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
@@ -124,6 +150,7 @@ func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
+		AlertCount:   make(map[string]int),
 		NotifierChan: notifierChannel,
 	}
 
@@ -138,6 +165,7 @@ func TestCleanUpSupressedAlerts(t *testing.T) {
 	mgr := AlertManager{
 		AppSuppress:      suppressedApps,
 		NotifierChan:     notifierChannel,
+		AlertCount:       make(map[string]int),
 		SuppressDuration: 1 * time.Minute,
 	}
 
@@ -153,6 +181,7 @@ func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
 	mgr := AlertManager{
 		AppSuppress:      suppressedApps,
 		NotifierChan:     notifierChannel,
+		AlertCount:       make(map[string]int),
 		SuppressDuration: 10 * time.Minute,
 	}
 

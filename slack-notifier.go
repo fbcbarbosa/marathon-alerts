@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	maps "github.com/ashwanthkumar/golang-utils/maps"
 	"github.com/ashwanthkumar/slack-go-webhook"
 )
 
@@ -28,9 +29,9 @@ func (s *Slack) Notify(check AppCheck) {
 		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true}).
 		AddField(slack.Field{Title: "Times", Value: fmt.Sprintf("%d", check.Times), Short: true})
 
-	destination := GetString(check.Labels, "alerts.slack.channel", s.Channel)
+	destination := maps.GetString(check.Labels, "alerts.slack.channel", s.Channel)
 
-	appSpecificOwners := GetString(check.Labels, "alerts.slack.owners", s.Owners)
+	appSpecificOwners := maps.GetString(check.Labels, "alerts.slack.owners", s.Owners)
 	var owners []string
 	if appSpecificOwners != "" {
 		owners = strings.Split(appSpecificOwners, ",")
@@ -50,7 +51,7 @@ func (s *Slack) Notify(check AppCheck) {
 		destination,
 		[]slack.Attachment{attachment})
 
-	webhooks := strings.Split(GetString(check.Labels, "alerts.slack.webhook", s.Webhook), ",")
+	webhooks := strings.Split(maps.GetString(check.Labels, "alerts.slack.webhook", s.Webhook), ",")
 
 	for _, webhook := range webhooks {
 		err := slack.Send(webhook, "", payload)

@@ -1,4 +1,4 @@
-package mocks
+package main
 
 import "github.com/gambol99/go-marathon"
 import "github.com/stretchr/testify/mock"
@@ -7,12 +7,12 @@ import "net/url"
 
 import "time"
 
-type Marathon struct {
+type MockMarathon struct {
 	mock.Mock
 }
 
 // ListApplications provides a mock function with given fields: _a0
-func (_m *Marathon) ListApplications(_a0 url.Values) ([]string, error) {
+func (_m *MockMarathon) ListApplications(_a0 url.Values) ([]string, error) {
 	ret := _m.Called(_a0)
 
 	var r0 []string
@@ -35,7 +35,7 @@ func (_m *Marathon) ListApplications(_a0 url.Values) ([]string, error) {
 }
 
 // ApplicationVersions provides a mock function with given fields: name
-func (_m *Marathon) ApplicationVersions(name string) (*marathon.ApplicationVersions, error) {
+func (_m *MockMarathon) ApplicationVersions(name string) (*marathon.ApplicationVersions, error) {
 	ret := _m.Called(name)
 
 	var r0 *marathon.ApplicationVersions
@@ -58,7 +58,7 @@ func (_m *Marathon) ApplicationVersions(name string) (*marathon.ApplicationVersi
 }
 
 // HasApplicationVersion provides a mock function with given fields: name, version
-func (_m *Marathon) HasApplicationVersion(name string, version string) (bool, error) {
+func (_m *MockMarathon) HasApplicationVersion(name string, version string) (bool, error) {
 	ret := _m.Called(name, version)
 
 	var r0 bool
@@ -79,7 +79,7 @@ func (_m *Marathon) HasApplicationVersion(name string, version string) (bool, er
 }
 
 // SetApplicationVersion provides a mock function with given fields: name, version
-func (_m *Marathon) SetApplicationVersion(name string, version *marathon.ApplicationVersion) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) SetApplicationVersion(name string, version *marathon.ApplicationVersion) (*marathon.DeploymentID, error) {
 	ret := _m.Called(name, version)
 
 	var r0 *marathon.DeploymentID
@@ -102,7 +102,7 @@ func (_m *Marathon) SetApplicationVersion(name string, version *marathon.Applica
 }
 
 // ApplicationOK provides a mock function with given fields: name
-func (_m *Marathon) ApplicationOK(name string) (bool, error) {
+func (_m *MockMarathon) ApplicationOK(name string) (bool, error) {
 	ret := _m.Called(name)
 
 	var r0 bool
@@ -123,7 +123,7 @@ func (_m *Marathon) ApplicationOK(name string) (bool, error) {
 }
 
 // CreateApplication provides a mock function with given fields: application
-func (_m *Marathon) CreateApplication(application *marathon.Application) (*marathon.Application, error) {
+func (_m *MockMarathon) CreateApplication(application *marathon.Application) (*marathon.Application, error) {
 	ret := _m.Called(application)
 
 	var r0 *marathon.Application
@@ -146,7 +146,7 @@ func (_m *Marathon) CreateApplication(application *marathon.Application) (*marat
 }
 
 // DeleteApplication provides a mock function with given fields: name
-func (_m *Marathon) DeleteApplication(name string) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) DeleteApplication(name string) (*marathon.DeploymentID, error) {
 	ret := _m.Called(name)
 
 	var r0 *marathon.DeploymentID
@@ -169,7 +169,7 @@ func (_m *Marathon) DeleteApplication(name string) (*marathon.DeploymentID, erro
 }
 
 // UpdateApplication provides a mock function with given fields: application, force
-func (_m *Marathon) UpdateApplication(application *marathon.Application, force bool) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) UpdateApplication(application *marathon.Application, force bool) (*marathon.DeploymentID, error) {
 	ret := _m.Called(application, force)
 
 	var r0 *marathon.DeploymentID
@@ -192,7 +192,7 @@ func (_m *Marathon) UpdateApplication(application *marathon.Application, force b
 }
 
 // ApplicationDeployments provides a mock function with given fields: name
-func (_m *Marathon) ApplicationDeployments(name string) ([]*marathon.DeploymentID, error) {
+func (_m *MockMarathon) ApplicationDeployments(name string) ([]*marathon.DeploymentID, error) {
 	ret := _m.Called(name)
 
 	var r0 []*marathon.DeploymentID
@@ -215,7 +215,7 @@ func (_m *Marathon) ApplicationDeployments(name string) ([]*marathon.DeploymentI
 }
 
 // ScaleApplicationInstances provides a mock function with given fields: name, instances, force
-func (_m *Marathon) ScaleApplicationInstances(name string, instances int, force bool) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) ScaleApplicationInstances(name string, instances int, force bool) (*marathon.DeploymentID, error) {
 	ret := _m.Called(name, instances, force)
 
 	var r0 *marathon.DeploymentID
@@ -238,7 +238,7 @@ func (_m *Marathon) ScaleApplicationInstances(name string, instances int, force 
 }
 
 // RestartApplication provides a mock function with given fields: name, force
-func (_m *Marathon) RestartApplication(name string, force bool) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) RestartApplication(name string, force bool) (*marathon.DeploymentID, error) {
 	ret := _m.Called(name, force)
 
 	var r0 *marathon.DeploymentID
@@ -261,7 +261,7 @@ func (_m *Marathon) RestartApplication(name string, force bool) (*marathon.Deplo
 }
 
 // Applications provides a mock function with given fields: _a0
-func (_m *Marathon) Applications(_a0 url.Values) (*marathon.Applications, error) {
+func (_m *MockMarathon) Applications(_a0 url.Values) (*marathon.Applications, error) {
 	ret := _m.Called(_a0)
 
 	var r0 *marathon.Applications
@@ -284,7 +284,7 @@ func (_m *Marathon) Applications(_a0 url.Values) (*marathon.Applications, error)
 }
 
 // Application provides a mock function with given fields: name
-func (_m *Marathon) Application(name string) (*marathon.Application, error) {
+func (_m *MockMarathon) Application(name string) (*marathon.Application, error) {
 	ret := _m.Called(name)
 
 	var r0 *marathon.Application
@@ -307,7 +307,7 @@ func (_m *Marathon) Application(name string) (*marathon.Application, error) {
 }
 
 // WaitOnApplication provides a mock function with given fields: name, timeout
-func (_m *Marathon) WaitOnApplication(name string, timeout time.Duration) error {
+func (_m *MockMarathon) WaitOnApplication(name string, timeout time.Duration) error {
 	ret := _m.Called(name, timeout)
 
 	var r0 error
@@ -321,7 +321,7 @@ func (_m *Marathon) WaitOnApplication(name string, timeout time.Duration) error 
 }
 
 // Tasks provides a mock function with given fields: application
-func (_m *Marathon) Tasks(application string) (*marathon.Tasks, error) {
+func (_m *MockMarathon) Tasks(application string) (*marathon.Tasks, error) {
 	ret := _m.Called(application)
 
 	var r0 *marathon.Tasks
@@ -344,7 +344,7 @@ func (_m *Marathon) Tasks(application string) (*marathon.Tasks, error) {
 }
 
 // AllTasks provides a mock function with given fields: opts
-func (_m *Marathon) AllTasks(opts *marathon.AllTasksOpts) (*marathon.Tasks, error) {
+func (_m *MockMarathon) AllTasks(opts *marathon.AllTasksOpts) (*marathon.Tasks, error) {
 	ret := _m.Called(opts)
 
 	var r0 *marathon.Tasks
@@ -367,7 +367,7 @@ func (_m *Marathon) AllTasks(opts *marathon.AllTasksOpts) (*marathon.Tasks, erro
 }
 
 // TaskEndpoints provides a mock function with given fields: name, port, healthCheck
-func (_m *Marathon) TaskEndpoints(name string, port int, healthCheck bool) ([]string, error) {
+func (_m *MockMarathon) TaskEndpoints(name string, port int, healthCheck bool) ([]string, error) {
 	ret := _m.Called(name, port, healthCheck)
 
 	var r0 []string
@@ -390,7 +390,7 @@ func (_m *Marathon) TaskEndpoints(name string, port int, healthCheck bool) ([]st
 }
 
 // KillApplicationTasks provides a mock function with given fields: applicationID, opts
-func (_m *Marathon) KillApplicationTasks(applicationID string, opts *marathon.KillApplicationTasksOpts) (*marathon.Tasks, error) {
+func (_m *MockMarathon) KillApplicationTasks(applicationID string, opts *marathon.KillApplicationTasksOpts) (*marathon.Tasks, error) {
 	ret := _m.Called(applicationID, opts)
 
 	var r0 *marathon.Tasks
@@ -413,7 +413,7 @@ func (_m *Marathon) KillApplicationTasks(applicationID string, opts *marathon.Ki
 }
 
 // KillTask provides a mock function with given fields: taskID, opts
-func (_m *Marathon) KillTask(taskID string, opts *marathon.KillTaskOpts) (*marathon.Task, error) {
+func (_m *MockMarathon) KillTask(taskID string, opts *marathon.KillTaskOpts) (*marathon.Task, error) {
 	ret := _m.Called(taskID, opts)
 
 	var r0 *marathon.Task
@@ -436,7 +436,7 @@ func (_m *Marathon) KillTask(taskID string, opts *marathon.KillTaskOpts) (*marat
 }
 
 // KillTasks provides a mock function with given fields: taskIDs, opts
-func (_m *Marathon) KillTasks(taskIDs []string, opts *marathon.KillTaskOpts) error {
+func (_m *MockMarathon) KillTasks(taskIDs []string, opts *marathon.KillTaskOpts) error {
 	ret := _m.Called(taskIDs, opts)
 
 	var r0 error
@@ -450,7 +450,7 @@ func (_m *Marathon) KillTasks(taskIDs []string, opts *marathon.KillTaskOpts) err
 }
 
 // Groups provides a mock function with given fields:
-func (_m *Marathon) Groups() (*marathon.Groups, error) {
+func (_m *MockMarathon) Groups() (*marathon.Groups, error) {
 	ret := _m.Called()
 
 	var r0 *marathon.Groups
@@ -473,7 +473,7 @@ func (_m *Marathon) Groups() (*marathon.Groups, error) {
 }
 
 // Group provides a mock function with given fields: name
-func (_m *Marathon) Group(name string) (*marathon.Group, error) {
+func (_m *MockMarathon) Group(name string) (*marathon.Group, error) {
 	ret := _m.Called(name)
 
 	var r0 *marathon.Group
@@ -496,7 +496,7 @@ func (_m *Marathon) Group(name string) (*marathon.Group, error) {
 }
 
 // CreateGroup provides a mock function with given fields: group
-func (_m *Marathon) CreateGroup(group *marathon.Group) error {
+func (_m *MockMarathon) CreateGroup(group *marathon.Group) error {
 	ret := _m.Called(group)
 
 	var r0 error
@@ -510,7 +510,7 @@ func (_m *Marathon) CreateGroup(group *marathon.Group) error {
 }
 
 // DeleteGroup provides a mock function with given fields: name
-func (_m *Marathon) DeleteGroup(name string) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) DeleteGroup(name string) (*marathon.DeploymentID, error) {
 	ret := _m.Called(name)
 
 	var r0 *marathon.DeploymentID
@@ -533,7 +533,7 @@ func (_m *Marathon) DeleteGroup(name string) (*marathon.DeploymentID, error) {
 }
 
 // UpdateGroup provides a mock function with given fields: id, group
-func (_m *Marathon) UpdateGroup(id string, group *marathon.Group) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) UpdateGroup(id string, group *marathon.Group) (*marathon.DeploymentID, error) {
 	ret := _m.Called(id, group)
 
 	var r0 *marathon.DeploymentID
@@ -556,7 +556,7 @@ func (_m *Marathon) UpdateGroup(id string, group *marathon.Group) (*marathon.Dep
 }
 
 // HasGroup provides a mock function with given fields: name
-func (_m *Marathon) HasGroup(name string) (bool, error) {
+func (_m *MockMarathon) HasGroup(name string) (bool, error) {
 	ret := _m.Called(name)
 
 	var r0 bool
@@ -577,7 +577,7 @@ func (_m *Marathon) HasGroup(name string) (bool, error) {
 }
 
 // WaitOnGroup provides a mock function with given fields: name, timeout
-func (_m *Marathon) WaitOnGroup(name string, timeout time.Duration) error {
+func (_m *MockMarathon) WaitOnGroup(name string, timeout time.Duration) error {
 	ret := _m.Called(name, timeout)
 
 	var r0 error
@@ -591,7 +591,7 @@ func (_m *Marathon) WaitOnGroup(name string, timeout time.Duration) error {
 }
 
 // Deployments provides a mock function with given fields:
-func (_m *Marathon) Deployments() ([]*marathon.Deployment, error) {
+func (_m *MockMarathon) Deployments() ([]*marathon.Deployment, error) {
 	ret := _m.Called()
 
 	var r0 []*marathon.Deployment
@@ -614,7 +614,7 @@ func (_m *Marathon) Deployments() ([]*marathon.Deployment, error) {
 }
 
 // DeleteDeployment provides a mock function with given fields: id, force
-func (_m *Marathon) DeleteDeployment(id string, force bool) (*marathon.DeploymentID, error) {
+func (_m *MockMarathon) DeleteDeployment(id string, force bool) (*marathon.DeploymentID, error) {
 	ret := _m.Called(id, force)
 
 	var r0 *marathon.DeploymentID
@@ -637,7 +637,7 @@ func (_m *Marathon) DeleteDeployment(id string, force bool) (*marathon.Deploymen
 }
 
 // HasDeployment provides a mock function with given fields: id
-func (_m *Marathon) HasDeployment(id string) (bool, error) {
+func (_m *MockMarathon) HasDeployment(id string) (bool, error) {
 	ret := _m.Called(id)
 
 	var r0 bool
@@ -658,7 +658,7 @@ func (_m *Marathon) HasDeployment(id string) (bool, error) {
 }
 
 // WaitOnDeployment provides a mock function with given fields: id, timeout
-func (_m *Marathon) WaitOnDeployment(id string, timeout time.Duration) error {
+func (_m *MockMarathon) WaitOnDeployment(id string, timeout time.Duration) error {
 	ret := _m.Called(id, timeout)
 
 	var r0 error
@@ -672,7 +672,7 @@ func (_m *Marathon) WaitOnDeployment(id string, timeout time.Duration) error {
 }
 
 // Subscriptions provides a mock function with given fields:
-func (_m *Marathon) Subscriptions() (*marathon.Subscriptions, error) {
+func (_m *MockMarathon) Subscriptions() (*marathon.Subscriptions, error) {
 	ret := _m.Called()
 
 	var r0 *marathon.Subscriptions
@@ -695,7 +695,7 @@ func (_m *Marathon) Subscriptions() (*marathon.Subscriptions, error) {
 }
 
 // AddEventsListener provides a mock function with given fields: channel, filter
-func (_m *Marathon) AddEventsListener(channel marathon.EventsChannel, filter int) error {
+func (_m *MockMarathon) AddEventsListener(channel marathon.EventsChannel, filter int) error {
 	ret := _m.Called(channel, filter)
 
 	var r0 error
@@ -709,12 +709,12 @@ func (_m *Marathon) AddEventsListener(channel marathon.EventsChannel, filter int
 }
 
 // RemoveEventsListener provides a mock function with given fields: channel
-func (_m *Marathon) RemoveEventsListener(channel marathon.EventsChannel) {
+func (_m *MockMarathon) RemoveEventsListener(channel marathon.EventsChannel) {
 	_m.Called(channel)
 }
 
 // Unsubscribe provides a mock function with given fields: _a0
-func (_m *Marathon) Unsubscribe(_a0 string) error {
+func (_m *MockMarathon) Unsubscribe(_a0 string) error {
 	ret := _m.Called(_a0)
 
 	var r0 error
@@ -728,7 +728,7 @@ func (_m *Marathon) Unsubscribe(_a0 string) error {
 }
 
 // GetMarathonURL provides a mock function with given fields:
-func (_m *Marathon) GetMarathonURL() string {
+func (_m *MockMarathon) GetMarathonURL() string {
 	ret := _m.Called()
 
 	var r0 string
@@ -742,7 +742,7 @@ func (_m *Marathon) GetMarathonURL() string {
 }
 
 // Ping provides a mock function with given fields:
-func (_m *Marathon) Ping() (bool, error) {
+func (_m *MockMarathon) Ping() (bool, error) {
 	ret := _m.Called()
 
 	var r0 bool
@@ -763,7 +763,7 @@ func (_m *Marathon) Ping() (bool, error) {
 }
 
 // Info provides a mock function with given fields:
-func (_m *Marathon) Info() (*marathon.Info, error) {
+func (_m *MockMarathon) Info() (*marathon.Info, error) {
 	ret := _m.Called()
 
 	var r0 *marathon.Info
@@ -786,7 +786,7 @@ func (_m *Marathon) Info() (*marathon.Info, error) {
 }
 
 // Leader provides a mock function with given fields:
-func (_m *Marathon) Leader() (string, error) {
+func (_m *MockMarathon) Leader() (string, error) {
 	ret := _m.Called()
 
 	var r0 string
@@ -807,7 +807,7 @@ func (_m *Marathon) Leader() (string, error) {
 }
 
 // AbdicateLeader provides a mock function with given fields:
-func (_m *Marathon) AbdicateLeader() (string, error) {
+func (_m *MockMarathon) AbdicateLeader() (string, error) {
 	ret := _m.Called()
 
 	var r0 string

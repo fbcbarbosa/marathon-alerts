@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ashwanthkumar/marathon-alerts/mocks"
 	marathon "github.com/gambol99/go-marathon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -13,7 +12,7 @@ import (
 
 func TestProcessCheckForAllSubscribers(t *testing.T) {
 	appLabels := make(map[string]string)
-	client := new(mocks.Marathon)
+	client := new(MockMarathon)
 	apps := marathon.Applications{
 		Apps: []marathon.Application{marathon.Application{Labels: appLabels}},
 	}
@@ -40,7 +39,7 @@ func TestProcessCheckForAllSubscribers(t *testing.T) {
 func TestProcessCheckForWithNoSubscribers(t *testing.T) {
 	appLabels := make(map[string]string)
 	appLabels["alerts.checks.subscribe"] = "check-that-does-not-exist"
-	client := new(mocks.Marathon)
+	client := new(MockMarathon)
 	apps := marathon.Applications{
 		Apps: []marathon.Application{marathon.Application{Labels: appLabels}},
 	}

@@ -18,14 +18,7 @@ all: setup
 	install
 
 setup:
-	go get github.com/spf13/pflag
-	go get github.com/ashwanthkumar/slack-go-webhook
-	go get github.com/gambol99/go-marathon
-	go get github.com/ashwanthkumar/golang-utils/sets
-	go get github.com/ashwanthkumar/golang-utils/maps
-	# Test deps
-	go get github.com/stretchr/testify/assert
-	go get github.com/stretchr/testify/mock
+	glide install
 
 test-only:
 	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/${name}

@@ -1,0 +1,13 @@
+package: .
+import:
+- package: github.com/ashwanthkumar/golang-utils
+  subpackages:
+  - maps
+  - sets
+- package: github.com/ashwanthkumar/slack-go-webhook
+- package: github.com/gambol99/go-marathon
+- package: github.com/spf13/pflag
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
+  - mock

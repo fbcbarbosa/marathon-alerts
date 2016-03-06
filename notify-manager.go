@@ -7,6 +7,7 @@ import (
 
 type Notifier interface {
 	Notify(check AppCheck)
+	Name() string
 }
 
 type NotifyManager struct {

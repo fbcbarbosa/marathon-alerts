@@ -13,6 +13,10 @@ type Slack struct {
 	Owners  string
 }
 
+func (s *Slack) Name() string {
+	return "slack"
+}
+
 func (s *Slack) Notify(check AppCheck) {
 	attachment := slack.Attachment{
 		Text:  &check.Message,

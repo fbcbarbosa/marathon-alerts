@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	maps "github.com/ashwanthkumar/golang-utils/maps"
 )
 
 const AlertsEnabledLabel = "alerts.enabled"
@@ -64,7 +66,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 	a.supressMutex.Lock()
 	defer a.supressMutex.Unlock()
 
-	alertEnabled := GetBoolean(check.Labels, AlertsEnabledLabel, true)
+	alertEnabled := maps.GetBoolean(check.Labels, AlertsEnabledLabel, true)
 
 	if alertEnabled {
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)

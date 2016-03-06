@@ -7,7 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ashwanthkumar/golang-utils/sets"
+	maps "github.com/ashwanthkumar/golang-utils/maps"
+	sets "github.com/ashwanthkumar/golang-utils/sets"
 	marathon "github.com/gambol99/go-marathon"
 )
 
@@ -84,7 +85,7 @@ func (a *AppChecker) processChecks() error {
 	}
 	for _, app := range apps.Apps {
 		checksSubscribed := sets.FromSlice(
-			strings.Split(GetString(app.Labels, CheckSubscriptionLabel, SubscribeAllChecks),
+			strings.Split(maps.GetString(app.Labels, CheckSubscriptionLabel, SubscribeAllChecks),
 				","))
 		for _, check := range a.Checks {
 			if checksSubscribed.Contains(check.Name()) || checksSubscribed.Contains(SubscribeAllChecks) {

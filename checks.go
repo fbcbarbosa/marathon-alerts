@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	maps "github.com/ashwanthkumar/golang-utils/maps"
 	"github.com/gambol99/go-marathon"
 )
 
@@ -26,8 +27,8 @@ func (n *MinHealthyTasks) Name() string {
 }
 
 func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
-	failThreshold := GetFloat32(app.Labels, "alerts.min-healthy.critical.threshold", n.DefaultCriticalThreshold)
-	warnThreshold := GetFloat32(app.Labels, "alerts.min-healthy.warn.threshold", n.DefaultWarningThreshold)
+	failThreshold := maps.GetFloat32(app.Labels, "alerts.min-healthy.critical.threshold", n.DefaultCriticalThreshold)
+	warnThreshold := maps.GetFloat32(app.Labels, "alerts.min-healthy.warn.threshold", n.DefaultWarningThreshold)
 	result := Pass
 	currentlyRunning := float32(app.TasksHealthy)
 	message := fmt.Sprintf("Only %d are healthy out of total %d", int(currentlyRunning), app.Instances)

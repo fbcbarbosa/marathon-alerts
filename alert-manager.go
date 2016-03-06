@@ -86,7 +86,12 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			keyPrefix := a.keyPrefix(check)
 			key := a.key(check, check.Result)
 			a.AppSuppress[key] = check.Timestamp
-			a.AlertCount[keyPrefix] = 1
+			_, present := a.AlertCount[keyPrefix]
+			if present {
+				a.AlertCount[keyPrefix]++
+			} else {
+				a.AlertCount[keyPrefix] = 1
+			}
 			check.Times = a.AlertCount[keyPrefix]
 			a.NotifierChan <- check
 		} else if !checkExists && check.Result == Pass {

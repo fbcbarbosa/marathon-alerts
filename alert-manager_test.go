@@ -191,3 +191,30 @@ func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
 	mgr.cleanUpSupressedAlerts()
 	assert.Equal(t, 1, len(mgr.AppSuppress))
 }
+
+func TestTimesCountAfterTheCheckHasBeenIdleForSuppressedDuration(t *testing.T) {
+	notifierChannel := make(chan AppCheck, 2)
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
+	suppressedApps := make(map[string]time.Time)
+	suppressedApps["/foo-check-name-2"] = time.Now().Add(-15 * time.Minute)
+	mgr := AlertManager{
+		AppSuppress:      suppressedApps,
+		NotifierChan:     notifierChannel,
+		AlertCount:       alertCount,
+		SuppressDuration: 10 * time.Minute,
+	}
+	check := AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    Critical,
+	}
+
+	// When Times 1
+	mgr.processCheck(check)
+	assert.Equal(t, 2, mgr.AlertCount["/foo-check-name"])
+	// After cleaning up supressed alerts
+	mgr.cleanUpSupressedAlerts()
+	mgr.processCheck(check)
+	assert.Equal(t, 3, mgr.AlertCount["/foo-check-name"])
+}

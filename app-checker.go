@@ -81,7 +81,11 @@ func (a *AppChecker) run() {
 }
 
 func (a *AppChecker) processChecks() error {
-	apps, err := a.Client.Applications(nil)
+	var apps *marathon.Applications
+	var err error
+	metrics.GetOrRegisterTimer("marathon-all-apps-response-time", nil).Time(func() {
+		apps, err = a.Client.Applications(nil)
+	})
 	metrics.GetOrRegisterCounter("apps-checker-marathon-all-apps-api", DebugMetricsRegistry).Inc(int64(1))
 	if err != nil {
 		return err

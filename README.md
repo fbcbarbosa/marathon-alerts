@@ -50,7 +50,8 @@ We collect some metrics internally in marathon-alerts. They're dumped periodical
 
 | Metric | Description |
 | :------------- | :------------- |
-| alerts-suppressed-cleaned       | Number of alerts we cleaned up because they got expired from suppress duration. |
+| alerts-suppressed-cleaned | Number of alerts we cleaned up because they got expired from suppress duration. |
+| marathon-all-apps-response-time | Response time of marathon's /v2/apps API call |
 | notifications-total | Total number of notifications we sent from AlertManager to NotificationManager |
 | notifications-warning | Number of Warning check notifications we sent from AlertManager to NotificationManager |
 | notifications-critical | Number of Critical check notifications we sent from AlertManager to NotificationManager |

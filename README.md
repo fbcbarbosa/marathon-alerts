@@ -9,14 +9,16 @@ This was initially built for Marathon 0.8.0, hence we don't use the event bus.
 ```
 $ marathon-alerts --help
 Usage of marathon-alerts:
-      --alerts-suppress-duration duration        Suppress alerts for this duration once notified (default 30m0s)
-      --check-interval duration                  Check runs periodically on this interval (default 30s)
-      --check-min-healthy-critical-threshold value   Min instances check critical threshold (default 0.5)
-      --check-min-healthy-warn-threshold value   Min instances check warning threshold (default 0.75)
-      --slack-channel string                     #Channel / @User to post the alert (defaults to webhook configuration)
-      --slack-owner string                       Comma list of owners who should be alerted on the post
-      --slack-webhook string                     Comma list of Slack webhooks to post the alert
-      --uri string                               Marathon URI to connect
+      --alerts-suppress-duration duration            Suppress alerts for this duration once notified (default 30m0s)
+      --check-interval duration                      Check runs periodically on this interval (default 30s)
+      --check-min-healthy-critical-threshold value   Min instances check fail threshold (default 0.5)
+      --check-min-healthy-warn-threshold value       Min instances check warning threshold (default 0.75)
+      --debug                                        Enable debug mode. More counters for now.
+      --pid string                                   File to write PID file (default "PID")
+      --slack-channel string                         #Channel / @User to post the alert (defaults to webhook configuration)
+      --slack-owner string                           Comma list of owners who should be alerted on the post
+      --slack-webhook string                         Comma list of Slack webhooks to post the alert
+      --uri string                                   Marathon URI to connect
 ```
 
 Example invocation would be like the following
@@ -45,13 +47,19 @@ We collect some metrics internally in marathon-alerts. They're dumped periodical
 | Metric | Description |
 | :------------- | :------------- |
 | alerts-suppressed-cleaned       | Number of alerts we cleaned up because they got expired from suppress duration. |
-| alerts-suppressed-called | Number of times we called AlertManager.cleanUpSupressedAlerts() |
-| alerts-process-check-called | Number of times we called AlertManager.processCheck() |
-| alerts-manager-stopped | Number of times we called AlertManager.Stop() |
 | notifications-total | Total number of notifications we sent from AlertManager to NotificationManager |
 | notifications-warning | Number of Warning check notifications we sent from AlertManager to NotificationManager |
 | notifications-critical | Number of Critical check notifications we sent from AlertManager to NotificationManager |
 | notifications-resolved | Number of Pass (aka Resolved) check notifications we sent from AlertManager to NotificationManager |
+
+## Debug Metrics
+Apart from the standard metrics above, we also collect quite a few other metrics, mostly for debugging purposes. You can enable these metrics if run `marathon-alerts` with a `--debug` flag.
+
+| Metric | Description |
+| :------------- | :------------- |
+| alerts-suppressed-called | Number of times we called AlertManager.cleanUpSupressedAlerts() |
+| alerts-process-check-called | Number of times we called AlertManager.processCheck() |
+| alerts-manager-stopped | Number of times we called AlertManager.Stop() |
 | apps-checker-stopped | Number of times we called AppChecker.Stop() |
 | apps-checker-marathon-all-apps-api | Number of times we called Marathon's /v2/apps API |
 | apps-checker-marathon-app-api | Number of times we called Marathon's /v2/apps/<id> API |

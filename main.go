@@ -88,7 +88,7 @@ func main() {
 
 	go metrics.Log(metrics.DefaultRegistry, 60*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 	if debugMode {
-		go metrics.Log(DebugMetricsRegistry, 5*time.Second, log.New(os.Stderr, "debug-metrics: ", log.Lmicroseconds))
+		go metrics.Log(DebugMetricsRegistry, 300*time.Second, log.New(os.Stderr, "debug-metrics: ", log.Lmicroseconds))
 	}
 	appChecker.RunWaitGroup.Wait()
 	// Handle signals and cleanup all routines

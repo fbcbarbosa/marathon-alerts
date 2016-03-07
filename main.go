@@ -86,7 +86,7 @@ func main() {
 	}
 	notifyManager.Start()
 
-	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+	go metrics.Log(metrics.DefaultRegistry, 60*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 	if debugMode {
 		go metrics.Log(DebugMetricsRegistry, 5*time.Second, log.New(os.Stderr, "debug-metrics: ", log.Lmicroseconds))
 	}

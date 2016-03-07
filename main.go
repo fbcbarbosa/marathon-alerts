@@ -64,7 +64,8 @@ func main() {
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
 		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
-	checks := []Checker{minHealthyTasks, minInstances}
+	suspendedCheck := &SuspendedCheck{}
+	checks := []Checker{minHealthyTasks, minInstances, suspendedCheck}
 
 	appChecker = AppChecker{
 		Client:        client,

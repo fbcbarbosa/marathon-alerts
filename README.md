@@ -43,7 +43,7 @@ Apart from the flags that are used while starting up, the functionality can be c
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).
 
 ## Building
-To build from source, clone the repo:
+To build from source, you need [`glide`](http://glide.sh/) tool in `$PATH`.
 
 ```
 $ cd $GOPATH/src

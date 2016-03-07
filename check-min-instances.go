@@ -8,29 +8,24 @@ import (
 	"github.com/gambol99/go-marathon"
 )
 
-type Checker interface {
-	Name() string
-	Check(marathon.Application) AppCheck
-}
-
-// Checks for minimum healthy instances of an app running with respect to total # of instances that is
+// Checks for minimum instances of an app running with respect to total # of instances that is
 // supposed to run
-type MinHealthyTasks struct {
+type MinInstances struct {
 	// DefaultWarningThreshold - overriden using alerts.min-instances.warning
 	DefaultWarningThreshold float32
 	// DefaultCriticalThreshold - overriden using alerts.min-instances.fail
 	DefaultCriticalThreshold float32
 }
 
-func (n *MinHealthyTasks) Name() string {
-	return "min-healthy"
+func (n *MinInstances) Name() string {
+	return "min-instances"
 }
 
-func (n *MinHealthyTasks) Check(app marathon.Application) AppCheck {
-	failThreshold := maps.GetFloat32(app.Labels, "alerts.min-healthy.critical.threshold", n.DefaultCriticalThreshold)
-	warnThreshold := maps.GetFloat32(app.Labels, "alerts.min-healthy.warn.threshold", n.DefaultWarningThreshold)
+func (n *MinInstances) Check(app marathon.Application) AppCheck {
+	failThreshold := maps.GetFloat32(app.Labels, "alerts.min-instances.critical.threshold", n.DefaultCriticalThreshold)
+	warnThreshold := maps.GetFloat32(app.Labels, "alerts.min-instances.warn.threshold", n.DefaultWarningThreshold)
 	result := Pass
-	currentlyRunning := float32(app.TasksHealthy)
+	currentlyRunning := float32(app.TasksHealthy + app.TasksStaged)
 	message := fmt.Sprintf("Only %d are healthy out of total %d", int(currentlyRunning), app.Instances)
 
 	if currentlyRunning == 0.0 && app.Instances > 0 {

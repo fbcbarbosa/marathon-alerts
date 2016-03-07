@@ -62,11 +62,11 @@ Apart from the standard metrics above, we also collect quite a few other metrics
 | alerts-manager-stopped | Number of times we called AlertManager.Stop() |
 | apps-checker-stopped | Number of times we called AppChecker.Stop() |
 | apps-checker-marathon-all-apps-api | Number of times we called Marathon's /v2/apps API |
-| apps-checker-marathon-app-api | Number of times we called Marathon's /v2/apps/<id> API |
+| apps-checker-marathon-app-api | Number of times we called Marathon's /v2/apps/&lt;id&gt; API |
 | apps-checker-alerts-sent | Number of checks we sent to AlertManager from AppChecker |
-| apps-checker-check-&lt;name&gt; | Number of checks identified by <name> we sent to AlertManager |
-| apps-checker-app-&lt;id&gt; | Number of checks for an app identified by <id> we sent to AlertManager |
-| apps-checker-&lt;id&gt;-&lt;name&gt; | Number of checks identified by <name> for an app identified by <id> we sent to AlertManager |
+| apps-checker-check-&lt;name&gt; | Number of checks identified by &lt;name&gt; we sent to AlertManager |
+| apps-checker-app-&lt;id&gt; | Number of checks for an app identified by &lt;id&gt; we sent to AlertManager |
+| apps-checker-&lt;id&gt;-&lt;name&gt; | Number of checks identified by &lt;name&gt; for an app identified by &lt;id&gt; we sent to AlertManager |
 
 
 ## Releases

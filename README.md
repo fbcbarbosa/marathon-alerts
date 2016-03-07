@@ -55,6 +55,7 @@ We collect some metrics internally in marathon-alerts. They're dumped periodical
 | notifications-warning | Number of Warning check notifications we sent from AlertManager to NotificationManager |
 | notifications-critical | Number of Critical check notifications we sent from AlertManager to NotificationManager |
 | notifications-resolved | Number of Pass (aka Resolved) check notifications we sent from AlertManager to NotificationManager |
+| notifications-rate | Meter metric that denotes the rate at which notifications are being sent |
 
 ## Debug Metrics
 Apart from the standard metrics above, we also collect quite a few other metrics, mostly for debugging purposes. You can enable these metrics if run `marathon-alerts` with a `--debug` flag.
@@ -71,7 +72,9 @@ Apart from the standard metrics above, we also collect quite a few other metrics
 | apps-checker-check-&lt;name&gt; | Number of checks identified by &lt;name&gt; we sent to AlertManager |
 | apps-checker-app-&lt;id&gt; | Number of checks for an app identified by &lt;id&gt; we sent to AlertManager |
 | apps-checker-&lt;id&gt;-&lt;name&gt; | Number of checks identified by &lt;name&gt; for an app identified by &lt;id&gt; we sent to AlertManager |
-
+| notifications-warning-rate | Meter metric that denotes the rate at which warning notifications are being sent |
+| notifications-critical-rate | Meter metric that denotes the rate at which critical notifications are being sent |
+| notifications-resolved-rate | Meter metric that denotes the rate at which resolved notifications are being sent |
 
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).

@@ -133,13 +133,17 @@ func (a *AlertManager) keyPrefix(check AppCheck) string {
 }
 
 func (a *AlertManager) incNotifCounter(check AppCheck) {
-	metrics.GetOrRegisterCounter("notifications-total", nil).Inc(int64(1))
+	metrics.GetOrRegisterCounter("notifications-total", nil).Inc(1)
+	metrics.GetOrRegisterMeter("notifications-rate", nil).Mark(1)
 	if check.Result == Warning {
-		metrics.GetOrRegisterCounter("notifications-warning", nil).Inc(int64(1))
+		metrics.GetOrRegisterCounter("notifications-warning", nil).Inc(1)
+		metrics.GetOrRegisterMeter("notifications-warning-rate", DebugMetricsRegistry).Mark(1)
 	} else if check.Result == Critical {
-		metrics.GetOrRegisterCounter("notifications-critical", nil).Inc(int64(1))
+		metrics.GetOrRegisterCounter("notifications-critical", nil).Inc(1)
+		metrics.GetOrRegisterMeter("notifications-critical-rate", DebugMetricsRegistry).Mark(1)
 	} else if check.Result == Pass {
-		metrics.GetOrRegisterCounter("notifications-resolved", nil).Inc(int64(1))
+		metrics.GetOrRegisterCounter("notifications-resolved", nil).Inc(1)
+		metrics.GetOrRegisterMeter("notifications-resolved-rate", DebugMetricsRegistry).Mark(1)
 	} else {
 		panic("Calling incCheckCounter for " + fmt.Sprintf("%v", check))
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 // === MinInstances ===
-func TestMinTasksWhenEverythingIsFine(t *testing.T) {
+func TestMinInstancesWhenEverythingIsFine(t *testing.T) {
 	check := MinInstances{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,

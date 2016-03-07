@@ -91,7 +91,6 @@ func (a *AppChecker) processChecks() error {
 		return err
 	}
 	for _, app := range apps.Apps {
-		metrics.GetOrRegisterCounter("apps-checker-marathon-app-api", DebugMetricsRegistry).Inc(int64(1))
 		checksSubscribed := sets.FromSlice(
 			strings.Split(maps.GetString(app.Labels, CheckSubscriptionLabel, SubscribeAllChecks),
 				","))

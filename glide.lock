@@ -1,5 +1,5 @@
-hash: da8d7d8e2014723a8e7ff16ad54ac6e95fd53bef93ee78461d93a66deb85f352
-updated: 2016-03-06T23:46:42.223890314+05:30
+hash: 0110c63a047f359b7c92127486417810cd8b530ef8ea0113bc6d99e7fe421569
+updated: 2016-03-07T10:26:24.460099907+05:30
 imports:
 - name: github.com/ashwanthkumar/golang-utils
   version: 6362d7ff76b62be7ac4ef53aad5812791b390974
@@ -28,6 +28,8 @@ imports:
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
+- name: github.com/rcrowley/go-metrics
+  version: eeba7bd0dd01ace6e690fa833b3f22aaec29af43
 - name: github.com/spf13/pflag
   version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
 - name: github.com/stretchr/objx
@@ -39,7 +41,7 @@ imports:
   - mock
   - http
 - name: golang.org/x/net
-  version: 08f168e593b5aab61849054b77981de812666697
+  version: a4bbce9fcae005b22ae5443f6af064d80a6f5a55
   subpackages:
   - publicsuffix
 devImports: []

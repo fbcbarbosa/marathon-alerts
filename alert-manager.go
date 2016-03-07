@@ -6,6 +6,7 @@ import (
 	"time"
 
 	maps "github.com/ashwanthkumar/golang-utils/maps"
+	"github.com/rcrowley/go-metrics"
 )
 
 const AlertsEnabledLabel = "alerts.enabled"
@@ -42,6 +43,7 @@ func (a *AlertManager) cleanUpSupressedAlerts() {
 	a.supressMutex.Lock()
 	for key, suppressedOn := range a.AppSuppress {
 		if time.Now().Sub(suppressedOn) > a.SuppressDuration {
+			metrics.GetOrRegisterCounter("alerts-suppressed-cleaned", nil).Inc(int64(1))
 			delete(a.AppSuppress, key)
 		}
 	}
@@ -53,10 +55,13 @@ func (a *AlertManager) run() {
 	for running {
 		select {
 		case <-time.After(5 * time.Second):
+			metrics.GetOrRegisterCounter("alerts-suppressed-called", nil).Inc(int64(1))
 			a.cleanUpSupressedAlerts()
 		case check := <-a.CheckerChan:
+			metrics.GetOrRegisterCounter("alerts-process-check-called", nil).Inc(int64(1))
 			a.processCheck(check)
 		case <-a.stopChannel:
+			metrics.GetOrRegisterCounter("alerts-manager-stopped", nil).Inc(int64(1))
 			running = false
 		}
 	}
@@ -75,6 +80,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
 			a.NotifierChan <- check
+			a.incNotifCounter(check)
 		} else if checkExists && check.Result != resultIfCheckExists {
 			delete(a.AppSuppress, keyIfCheckExists)
 			key := a.key(check, check.Result)
@@ -82,6 +88,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			a.AlertCount[keyPrefixIfCheckExists]++
 			check.Times = a.AlertCount[keyPrefixIfCheckExists]
 			a.NotifierChan <- check
+			a.incNotifCounter(check)
 		} else if !checkExists && check.Result != Pass {
 			keyPrefix := a.keyPrefix(check)
 			key := a.key(check, check.Result)
@@ -94,6 +101,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			}
 			check.Times = a.AlertCount[keyPrefix]
 			a.NotifierChan <- check
+			a.incNotifCounter(check)
 		} else if !checkExists && check.Result == Pass {
 			keyPrefix := a.keyPrefix(check)
 			delete(a.AlertCount, keyPrefix)
@@ -122,4 +130,17 @@ func (a *AlertManager) key(check AppCheck, level CheckStatus) string {
 
 func (a *AlertManager) keyPrefix(check AppCheck) string {
 	return fmt.Sprintf("%s-%s", check.App, check.CheckName)
+}
+
+func (a *AlertManager) incNotifCounter(check AppCheck) {
+	metrics.GetOrRegisterCounter("notifications-total", nil).Inc(int64(1))
+	if check.Result == Warning {
+		metrics.GetOrRegisterCounter("notifications-warning", nil).Inc(int64(1))
+	} else if check.Result == Critical {
+		metrics.GetOrRegisterCounter("notifications-critical", nil).Inc(int64(1))
+	} else if check.Result == Pass {
+		metrics.GetOrRegisterCounter("notifications-resolved", nil).Inc(int64(1))
+	} else {
+		panic("Calling incCheckCounter for " + fmt.Sprintf("%v", check))
+	}
 }

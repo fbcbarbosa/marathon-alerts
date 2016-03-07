@@ -11,6 +11,7 @@ import (
 	flag "github.com/spf13/pflag"
 
 	marathon "github.com/gambol99/go-marathon"
+	"github.com/rcrowley/go-metrics"
 )
 
 var appChecker AppChecker
@@ -81,6 +82,7 @@ func main() {
 	}
 	notifyManager.Start()
 
+	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 	appChecker.RunWaitGroup.Wait()
 	// Handle signals and cleanup all routines
 }

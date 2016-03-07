@@ -37,6 +37,8 @@ Apart from the flags that are used while starting up, the functionality can be c
 | alerts.checks.subscribe  | Comma separated list of checks that needs to be run. Defaults - all | all |
 | alerts.min-healthy.critical.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-critical-threshold` | 0.5 |
 | alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
+| alerts.min-instances.critical.threshold  | Failure threshold for min-instances check. Defaults - `--check-min-instances-critical-threshold` | 0.5 |
+| alerts.min-instances.warn.threshold  | Warning threshold for min-instances check. Defaults - `--check-min-instances-warn-threshold` | 0.4 |
 | alerts.slack.webhook  | Comma separated list of Slack webhooks to send slack notifications. Overrides - `--slack-webhook` | http://hooks.slack.com/.../ |
 | alerts.slack.channel  | #Channel / @User to post the alert into. Overrides - `--slack-channel`  | z_development |
 | alerts.slack.owners  | Comma separated list of users who should be tagged in the alert. Overrides - `--slack-owner`  | ashwanthkumar,slackbot |
@@ -86,7 +88,8 @@ $ make build  # Builds the distribution specific binary
 ```
 
 ## Available Checks
-- [x] `min-healthy` - Minimum % of Task instances should be healthy else this check is fired.
+- [x] `min-healthy` - Minimum % of Task instances that should be healthy else this check is fired.
+- [x] `min-instances` - Minimum % of Task instances that should be healthy or staged, else this check is fired.
 - [ ] `max-instances` - If the number of instances goes beyond some % of the pre-defined max limit
 - [ ] `suspended` - If the service was suspended by mistake or unintentionally. `min-healthy` doesn't catch suspended services today.
 

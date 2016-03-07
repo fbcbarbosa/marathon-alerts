@@ -73,7 +73,7 @@ func (a *AppChecker) run() {
 				log.Fatalf("Unexpected error - %v\n", err)
 			}
 		case <-a.stopChannel:
-			metrics.GetOrRegisterCounter("apps-checker-stopped", nil).Inc(int64(1))
+			metrics.GetOrRegisterCounter("apps-checker-stopped", DebugMetricsRegistry).Inc(int64(1))
 			running = false
 		}
 		time.Sleep(1 * time.Second)
@@ -82,12 +82,12 @@ func (a *AppChecker) run() {
 
 func (a *AppChecker) processChecks() error {
 	apps, err := a.Client.Applications(nil)
-	metrics.GetOrRegisterCounter("apps-checker-marathon-all-apps-api", nil).Inc(int64(1))
+	metrics.GetOrRegisterCounter("apps-checker-marathon-all-apps-api", DebugMetricsRegistry).Inc(int64(1))
 	if err != nil {
 		return err
 	}
 	for _, app := range apps.Apps {
-		metrics.GetOrRegisterCounter("apps-checker-marathon-app-api", nil).Inc(int64(1))
+		metrics.GetOrRegisterCounter("apps-checker-marathon-app-api", DebugMetricsRegistry).Inc(int64(1))
 		checksSubscribed := sets.FromSlice(
 			strings.Split(maps.GetString(app.Labels, CheckSubscriptionLabel, SubscribeAllChecks),
 				","))
@@ -95,10 +95,10 @@ func (a *AppChecker) processChecks() error {
 			if checksSubscribed.Contains(check.Name()) || checksSubscribed.Contains(SubscribeAllChecks) {
 				result := check.Check(app)
 				a.AlertsChannel <- result
-				metrics.GetOrRegisterCounter("apps-checker-alerts-sent", nil).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-check-"+check.Name(), nil).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-app-"+app.ID, nil).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-"+app.ID+"-"+check.Name(), nil).Inc(int64(1))
+				metrics.GetOrRegisterCounter("apps-checker-alerts-sent", DebugMetricsRegistry).Inc(int64(1))
+				metrics.GetOrRegisterCounter("apps-checker-check-"+check.Name(), DebugMetricsRegistry).Inc(int64(1))
+				metrics.GetOrRegisterCounter("apps-checker-app-"+app.ID, DebugMetricsRegistry).Inc(int64(1))
+				metrics.GetOrRegisterCounter("apps-checker-"+app.ID+"-"+check.Name(), DebugMetricsRegistry).Inc(int64(1))
 			}
 		}
 	}

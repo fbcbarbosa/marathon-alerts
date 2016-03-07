@@ -26,12 +26,15 @@ var minHealthyCriticalThreshold float32
 var marathonURI string
 var checkInterval time.Duration
 var alertSuppressDuration time.Duration
+var debugMode bool
 
 // Slack flags
 var slackWebhooks string
 var slackChannel string
 var slackOwners string
 var pidFile string
+
+var DebugMetricsRegistry metrics.Registry
 
 func main() {
 	os.Args[0] = "marathon-alerts"
@@ -49,6 +52,7 @@ func main() {
 		fmt.Printf("%v\n", err)
 		os.Exit(1)
 	}
+	DebugMetricsRegistry = metrics.NewPrefixedRegistry("debug")
 
 	minHealthyTasks := &MinHealthyTasks{
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
@@ -83,6 +87,9 @@ func main() {
 	notifyManager.Start()
 
 	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+	if debugMode {
+		go metrics.Log(DebugMetricsRegistry, 5*time.Second, log.New(os.Stderr, "debug-metrics: ", log.Lmicroseconds))
+	}
 	appChecker.RunWaitGroup.Wait()
 	// Handle signals and cleanup all routines
 }
@@ -100,6 +107,7 @@ func marathonClient(uri string) (marathon.Marathon, error) {
 func defineFlags() {
 	flag.StringVar(&marathonURI, "uri", "", "Marathon URI to connect")
 	flag.StringVar(&pidFile, "pid", "PID", "File to write PID file")
+	flag.BoolVar(&debugMode, "debug", false, "Enable debug mode. More counters for now.")
 	flag.DurationVar(&checkInterval, "check-interval", 30*time.Second, "Check runs periodically on this interval")
 	flag.DurationVar(&alertSuppressDuration, "alerts-suppress-duration", 30*time.Minute, "Suppress alerts for this duration once notified")
 

@@ -55,13 +55,13 @@ func (a *AlertManager) run() {
 	for running {
 		select {
 		case <-time.After(5 * time.Second):
-			metrics.GetOrRegisterCounter("alerts-suppressed-called", nil).Inc(int64(1))
+			metrics.GetOrRegisterCounter("alerts-suppressed-called", DebugMetricsRegistry).Inc(int64(1))
 			a.cleanUpSupressedAlerts()
 		case check := <-a.CheckerChan:
-			metrics.GetOrRegisterCounter("alerts-process-check-called", nil).Inc(int64(1))
+			metrics.GetOrRegisterCounter("alerts-process-check-called", DebugMetricsRegistry).Inc(int64(1))
 			a.processCheck(check)
 		case <-a.stopChannel:
-			metrics.GetOrRegisterCounter("alerts-manager-stopped", nil).Inc(int64(1))
+			metrics.GetOrRegisterCounter("alerts-manager-stopped", DebugMetricsRegistry).Inc(int64(1))
 			running = false
 		}
 	}

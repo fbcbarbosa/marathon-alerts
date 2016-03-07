@@ -39,6 +39,28 @@ Apart from the flags that are used while starting up, the functionality can be c
 | alerts.slack.channel  | #Channel / @User to post the alert into. Overrides - `--slack-channel`  | z_development |
 | alerts.slack.owners  | Comma separated list of users who should be tagged in the alert. Overrides - `--slack-owner`  | ashwanthkumar,slackbot |
 
+## Metrics
+We collect some metrics internally in marathon-alerts. They're dumped periodically to STDERR. You can find the list of metrics and it's usage in the following table
+
+| Metric | Description |
+| :------------- | :------------- |
+| alerts-suppressed-cleaned       | Number of alerts we cleaned up because they got expired from suppress duration. |
+| alerts-suppressed-called | Number of times we called AlertManager.cleanUpSupressedAlerts() |
+| alerts-process-check-called | Number of times we called AlertManager.processCheck() |
+| alerts-manager-stopped | Number of times we called AlertManager.Stop() |
+| notifications-total | Total number of notifications we sent from AlertManager to NotificationManager |
+| notifications-warning | Number of Warning check notifications we sent from AlertManager to NotificationManager |
+| notifications-critical | Number of Critical check notifications we sent from AlertManager to NotificationManager |
+| notifications-resolved | Number of Pass (aka Resolved) check notifications we sent from AlertManager to NotificationManager |
+| apps-checker-stopped | Number of times we called AppChecker.Stop() |
+| apps-checker-marathon-all-apps-api | Number of times we called Marathon's /v2/apps API |
+| apps-checker-marathon-app-api | Number of times we called Marathon's /v2/apps/<id> API |
+| apps-checker-alerts-sent | Number of checks we sent to AlertManager from AppChecker |
+| apps-checker-check-<name> | Number of checks identified by <name> we sent to AlertManager |
+| apps-checker-app-<id> | Number of checks for an app identified by <id> we sent to AlertManager |
+| apps-checker-<id>-<name> | Number of checks identified by <name> for an app identified by <id> we sent to AlertManager |
+
+
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).
 

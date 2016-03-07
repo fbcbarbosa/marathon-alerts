@@ -29,12 +29,12 @@ var marathonURI string
 var checkInterval time.Duration
 var alertSuppressDuration time.Duration
 var debugMode bool
+var pidFile string
 
 // Slack flags
 var slackWebhooks string
 var slackChannel string
 var slackOwners string
-var pidFile string
 
 var DebugMetricsRegistry metrics.Registry
 

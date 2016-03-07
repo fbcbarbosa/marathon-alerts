@@ -96,7 +96,7 @@ $ make build  # Builds the distribution specific binary
 - [x] `min-healthy` - Minimum % of Task instances that should be healthy else this check is fired.
 - [x] `min-instances` - Minimum % of Task instances that should be healthy or staged, else this check is fired.
 - [ ] `max-instances` - If the number of instances goes beyond some % of the pre-defined max limit
-- [ ] `suspended` - If the service was suspended by mistake or unintentionally. `min-healthy` doesn't catch suspended services today.
+- [x] `suspended` - If the service was suspended by mistake or unintentionally. `min-healthy` doesn't catch suspended services today.
 
 ## Notifiers
 - [x] Slack

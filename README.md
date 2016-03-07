@@ -9,16 +9,18 @@ This was initially built for Marathon 0.8.0, hence we don't use the event bus.
 ```
 $ marathon-alerts --help
 Usage of marathon-alerts:
-      --alerts-suppress-duration duration            Suppress alerts for this duration once notified (default 30m0s)
-      --check-interval duration                      Check runs periodically on this interval (default 30s)
-      --check-min-healthy-critical-threshold value   Min instances check fail threshold (default 0.5)
-      --check-min-healthy-warn-threshold value       Min instances check warning threshold (default 0.75)
-      --debug                                        Enable debug mode. More counters for now.
-      --pid string                                   File to write PID file (default "PID")
-      --slack-channel string                         #Channel / @User to post the alert (defaults to webhook configuration)
-      --slack-owner string                           Comma list of owners who should be alerted on the post
-      --slack-webhook string                         Comma list of Slack webhooks to post the alert
-      --uri string                                   Marathon URI to connect
+      --alerts-suppress-duration duration              Suppress alerts for this duration once notified (default 30m0s)
+      --check-interval duration                        Check runs periodically on this interval (default 30s)
+      --check-min-healthy-critical-threshold value     Min Healthy instances check fail threshold (default 0.5)
+      --check-min-healthy-warn-threshold value         Min Healthy instances check warning threshold (default 0.75)
+      --check-min-instances-critical-threshold value   Min Instances check fail threshold (default 0.5)
+      --check-min-instances-warn-threshold value       Min Instances check warning threshold (default 0.75)
+      --debug                                          Enable debug mode. More counters for now.
+      --pid string                                     File to write PID file (default "PID")
+      --slack-channel string                           #Channel / @User to post the alert (defaults to webhook configuration)
+      --slack-owner string                             Comma list of owners who should be alerted on the post
+      --slack-webhook string                           Comma list of Slack webhooks to post the alert
+      --uri string                                     Marathon URI to connect
 ```
 
 Example invocation would be like the following

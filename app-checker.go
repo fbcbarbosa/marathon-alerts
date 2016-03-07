@@ -73,7 +73,7 @@ func (a *AppChecker) run() {
 				log.Fatalf("Unexpected error - %v\n", err)
 			}
 		case <-a.stopChannel:
-			metrics.GetOrRegisterCounter("apps-checker-stopped", DebugMetricsRegistry).Inc(int64(1))
+			metrics.GetOrRegisterCounter("apps-checker-stopped", DebugMetricsRegistry).Inc(1)
 			running = false
 		}
 		time.Sleep(1 * time.Second)
@@ -86,7 +86,7 @@ func (a *AppChecker) processChecks() error {
 	metrics.GetOrRegisterTimer("marathon-all-apps-response-time", nil).Time(func() {
 		apps, err = a.Client.Applications(nil)
 	})
-	metrics.GetOrRegisterCounter("apps-checker-marathon-all-apps-api", DebugMetricsRegistry).Inc(int64(1))
+	metrics.GetOrRegisterCounter("apps-checker-marathon-all-apps-api", DebugMetricsRegistry).Inc(1)
 	if err != nil {
 		return err
 	}
@@ -98,10 +98,10 @@ func (a *AppChecker) processChecks() error {
 			if checksSubscribed.Contains(check.Name()) || checksSubscribed.Contains(SubscribeAllChecks) {
 				result := check.Check(app)
 				a.AlertsChannel <- result
-				metrics.GetOrRegisterCounter("apps-checker-alerts-sent", DebugMetricsRegistry).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-check-"+check.Name(), DebugMetricsRegistry).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-app-"+app.ID, DebugMetricsRegistry).Inc(int64(1))
-				metrics.GetOrRegisterCounter("apps-checker-"+app.ID+"-"+check.Name(), DebugMetricsRegistry).Inc(int64(1))
+				metrics.GetOrRegisterCounter("apps-checker-alerts-sent", DebugMetricsRegistry).Inc(1)
+				metrics.GetOrRegisterCounter("apps-checker-check-"+check.Name(), DebugMetricsRegistry).Inc(1)
+				metrics.GetOrRegisterCounter("apps-checker-app-"+app.ID, DebugMetricsRegistry).Inc(1)
+				metrics.GetOrRegisterCounter("apps-checker-"+app.ID+"-"+check.Name(), DebugMetricsRegistry).Inc(1)
 			}
 		}
 	}

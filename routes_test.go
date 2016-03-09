@@ -49,6 +49,12 @@ func TestParseRoutesForMultipleRoutes(t *testing.T) {
 	assert.Equal(t, expectedRoute, route)
 }
 
+func TestParseInvalidCheckLevel(t *testing.T) {
+	routeString := "min-healthy/blahblah/slack"
+	_, err := ParseRoutes(routeString)
+	assert.Error(t, err)
+}
+
 func TestParseCheckLevel(t *testing.T) {
 	expected := make(map[string]CheckStatus)
 	expected["Warning"] = Warning

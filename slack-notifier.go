@@ -21,12 +21,12 @@ func (s *Slack) Name() string {
 func (s *Slack) Notify(check AppCheck) {
 	attachment := slack.Attachment{
 		Text:  &check.Message,
-		Color: s.resultToColor(check),
+		Color: s.resultToColor(check.Result),
 	}
 	attachment.
 		AddField(slack.Field{Title: "App", Value: check.App, Short: true}).
 		AddField(slack.Field{Title: "Check", Value: check.CheckName, Short: true}).
-		AddField(slack.Field{Title: "Result", Value: s.resultToString(check), Short: true}).
+		AddField(slack.Field{Title: "Result", Value: s.resultToString(check.Result), Short: true}).
 		AddField(slack.Field{Title: "Times", Value: fmt.Sprintf("%d", check.Times), Short: true})
 
 	destination := maps.GetString(check.Labels, "alerts.slack.channel", s.Channel)
@@ -61,29 +61,31 @@ func (s *Slack) Notify(check AppCheck) {
 	}
 }
 
-func (s *Slack) resultToColor(check AppCheck) *string {
+func (s *Slack) resultToColor(result CheckStatus) *string {
 	color := "black"
-	switch check.Result {
-	case Pass:
+	switch {
+	case Pass == result || Resolved == result:
 		color = "good"
-	case Warning:
+	case Warning == result:
 		color = "warning"
-	case Critical:
+	case Critical == result:
 		color = "danger"
 	}
 
 	return &color
 }
 
-func (s *Slack) resultToString(check AppCheck) string {
+func (s *Slack) resultToString(result CheckStatus) string {
 	value := "Unknown"
-	switch check.Result {
+	switch result {
 	case Pass:
 		value = "Passed"
+	case Resolved:
+		value = "Resolved"
 	case Warning:
 		value = "Warning"
 	case Critical:
-		value = "Failed"
+		value = "Critical"
 	}
 
 	return value

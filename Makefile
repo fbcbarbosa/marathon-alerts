@@ -1,6 +1,6 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
-TESTFLAGS=-v
+TESTFLAGS=-v -cover
 
 build:
 	go build -tags netgo -ldflags "-w" -o ${APPNAME} .

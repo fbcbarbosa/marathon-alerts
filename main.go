@@ -92,10 +92,10 @@ func main() {
 		Notifiers: notifiers,
 	}
 	notifyManager.Start()
-	metrics.RegisterDebugGCStats(metrics.DefaultRegistry)
-	metrics.RegisterRuntimeMemStats(metrics.DefaultRegistry)
-	go metrics.CaptureDebugGCStats(metrics.DefaultRegistry, 15*time.Minute)
-	go metrics.CaptureRuntimeMemStats(metrics.DefaultRegistry, 5*time.Minute)
+	metrics.RegisterDebugGCStats(DebugMetricsRegistry)
+	metrics.RegisterRuntimeMemStats(DebugMetricsRegistry)
+	go metrics.CaptureDebugGCStats(DebugMetricsRegistry, 15*time.Minute)
+	go metrics.CaptureRuntimeMemStats(DebugMetricsRegistry, 5*time.Minute)
 	go metrics.Log(metrics.DefaultRegistry, 60*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 	if debugMode {
 		go metrics.Log(DebugMetricsRegistry, 300*time.Second, log.New(os.Stderr, "debug-metrics: ", log.Lmicroseconds))

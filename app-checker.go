@@ -22,6 +22,7 @@ type CheckStatus uint8
 
 const (
 	Pass     = CheckStatus(99)
+	Resolved = CheckStatus(98)
 	Warning  = CheckStatus(2)
 	Critical = CheckStatus(1)
 )

@@ -139,6 +139,34 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
+func TestProcessCheckWhenResolvedCheckArrives(t *testing.T) {
+	notifierChannel := make(chan AppCheck, 1)
+	suppressedApps := make(map[string]time.Time)
+	suppressedApps["/foo-check-name-2"] = time.Now()
+	check := AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    Pass,
+	}
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
+	mgr := AlertManager{
+		AppSuppress:  suppressedApps,
+		AlertCount:   alertCount,
+		NotifierChan: notifierChannel,
+	}
+
+	mgr.processCheck(check)
+	assert.Len(t, notifierChannel, 1)
+	actualCheck := <-notifierChannel
+	assert.Equal(t, "/foo", actualCheck.App)
+	assert.Equal(t, "check-name", actualCheck.CheckName)
+	assert.Equal(t, Resolved, actualCheck.Result)
+	assert.Equal(t, 2, actualCheck.Times)
+	// We remove AlertCount upon Resolved check
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
+}
+
 func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
 	notifierChannel := make(chan AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)

@@ -77,6 +77,9 @@ func (a *AlertManager) processCheck(check AppCheck) {
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
 
 		if checkExists && check.Result == Pass {
+			a.AlertCount[keyPrefixIfCheckExists]++
+			check.Times = a.AlertCount[keyPrefixIfCheckExists]
+			check.Result = Resolved
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
 			a.NotifierChan <- check
@@ -142,6 +145,9 @@ func (a *AlertManager) incNotifCounter(check AppCheck) {
 		metrics.GetOrRegisterCounter("notifications-critical", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-critical-rate", DebugMetricsRegistry).Mark(1)
 	} else if check.Result == Pass {
+		metrics.GetOrRegisterCounter("notifications-pass", nil).Inc(1)
+		metrics.GetOrRegisterMeter("notifications-pass-rate", DebugMetricsRegistry).Mark(1)
+	} else if check.Result == Resolved {
 		metrics.GetOrRegisterCounter("notifications-resolved", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-resolved-rate", DebugMetricsRegistry).Mark(1)
 	} else {

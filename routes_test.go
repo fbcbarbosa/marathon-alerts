@@ -63,6 +63,9 @@ func TestParseCheckLevel(t *testing.T) {
 	expected["pass"] = Pass
 	expected["PASS"] = Pass
 	expected["PaSs"] = Pass
+	expected["Resolved"] = Resolved
+	expected["RESOLVED"] = Resolved
+	expected["ReSoLvEd"] = Resolved
 	for input, expectedOutput := range expected {
 		output, err := parseCheckLevel(input)
 		assert.NoError(t, err)

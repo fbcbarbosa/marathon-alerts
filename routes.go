@@ -48,7 +48,9 @@ func parseCheckLevel(checkLevel string) (CheckStatus, error) {
 		return Critical, nil
 	case "pass":
 		return Pass, nil
+	case "resolved":
+		return Resolved, nil
 	default:
-		return Critical, fmt.Errorf("Expected one of warning / critical / pass but %s found", strings.ToLower(checkLevel))
+		return Critical, fmt.Errorf("Expected one of warning / critical / pass / resolved but %s found", strings.ToLower(checkLevel))
 	}
 }

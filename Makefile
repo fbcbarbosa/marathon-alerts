@@ -1,6 +1,6 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
-TESTFLAGS=-v -cover -coverprofile cover.out
+TESTFLAGS=-v -cover -coverprofile=coverage.txt
 TEST_COVERAGE_THRESHOLD=48.0
 
 build:
@@ -28,8 +28,8 @@ test:
 	go test ${TESTFLAGS} github.com/ashwanthkumar/marathon-alerts/
 
 test-ci: test
-	@go tool cover -html=cover.out -o coverage.html
-	@go tool cover -func=cover.out | grep "total:" | awk '{print $$3}' | sed -e 's/%//' > coverage.txt
-	@bash -c 'COVERAGE=$$(cat coverage.txt);	\
+	@go tool cover -html=coverage.txt -o coverage.html
+	@go tool cover -func=coverage.txt | grep "total:" | awk '{print $$3}' | sed -e 's/%//' > coverage.out
+	@bash -c 'COVERAGE=$$(cat coverage.out);	\
 	echo "Current Coverage % is $$COVERAGE, expected is ${TEST_COVERAGE_THRESHOLD}.";	\
 	exit $$(echo $$COVERAGE"<${TEST_COVERAGE_THRESHOLD}" | bc -l)'

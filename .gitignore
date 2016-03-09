@@ -3,3 +3,6 @@ marathon-alerts-*
 .DS_Store
 vendor/
 PID
+cover.out
+coverage.html
+coverage.txt

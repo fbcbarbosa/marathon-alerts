@@ -81,3 +81,21 @@ func TestParseCheckLevel(t *testing.T) {
 	_, err := parseCheckLevel("invalid-check-level")
 	assert.Error(t, err)
 }
+
+func TestDefaultRoutes(t *testing.T) {
+	allWarningRoute := DefaultRoutes[0]
+	expectedWarningRoute := Route{
+		Check:      "*",
+		CheckLevel: Warning,
+		Notifier:   "*",
+	}
+	assert.Equal(t, expectedWarningRoute, allWarningRoute)
+
+	allCriticalRoute := DefaultRoutes[1]
+	expectedCriticalRoute := Route{
+		Check:      "*",
+		CheckLevel: Critical,
+		Notifier:   "*",
+	}
+	assert.Equal(t, expectedCriticalRoute, allCriticalRoute)
+}

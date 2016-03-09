@@ -40,8 +40,10 @@ func (s *Slack) Notify(check AppCheck) {
 	}
 
 	alertSuffix := "Please check!"
-	if check.Result == Pass {
+	if check.Result == Resolved {
 		alertSuffix = "Check Resolved, thanks!"
+	} else if check.Result == Pass {
+		alertSuffix = "Check Passed"
 	}
 	mainText := fmt.Sprintf("%s, %s", s.parseOwners(owners), alertSuffix)
 

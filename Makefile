@@ -1,6 +1,6 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
-TESTFLAGS=-v -cover -coverprofile=coverage.txt
+TESTFLAGS=-v -cover -coverprofile=coverage.txt -covermode=atomic
 TEST_COVERAGE_THRESHOLD=48.0
 
 build:

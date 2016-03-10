@@ -83,7 +83,10 @@ func TestParseCheckLevel(t *testing.T) {
 }
 
 func TestDefaultRoutes(t *testing.T) {
-	allWarningRoute := DefaultRoutes[0]
+	defaultRoutes, err := ParseRoutes(DefaultRoutes)
+	assert.NoError(t, err)
+	assert.Len(t, defaultRoutes, 2)
+	allWarningRoute := defaultRoutes[0]
 	expectedWarningRoute := Route{
 		Check:      "*",
 		CheckLevel: Warning,
@@ -91,7 +94,7 @@ func TestDefaultRoutes(t *testing.T) {
 	}
 	assert.Equal(t, expectedWarningRoute, allWarningRoute)
 
-	allCriticalRoute := DefaultRoutes[1]
+	allCriticalRoute := defaultRoutes[1]
 	expectedCriticalRoute := Route{
 		Check:      "*",
 		CheckLevel: Critical,

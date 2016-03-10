@@ -5,10 +5,7 @@ import (
 	"strings"
 )
 
-var DefaultRoutes = [...]Route{
-	Route{Check: "*", CheckLevel: Warning, Notifier: "*"},
-	Route{Check: "*", CheckLevel: Critical, Notifier: "*"},
-}
+var DefaultRoutes = "*/warning/*;*/critical/*"
 
 // Routes holds the routing information for every checks, alert level combination which Notifier
 // should be used.

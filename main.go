@@ -82,7 +82,7 @@ func main() {
 	}
 	alertManager.Start()
 
-	var allNotifiers []Notifier
+	var allNotifiers []notifiers.Notifier
 	slack := notifiers.Slack{
 		Webhook: slackWebhooks,
 		Channel: slackChannel,

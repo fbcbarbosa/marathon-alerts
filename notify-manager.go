@@ -5,17 +5,13 @@ import (
 	"sync"
 
 	"github.com/ashwanthkumar/marathon-alerts/checks"
+	"github.com/ashwanthkumar/marathon-alerts/notifiers"
 )
-
-type Notifier interface {
-	Notify(check checks.AppCheck)
-	Name() string
-}
 
 type NotifyManager struct {
 	// channel to get checks for notification
 	AlertChan chan checks.AppCheck
-	Notifiers []Notifier
+	Notifiers []notifiers.Notifier
 
 	RunWaitGroup      sync.WaitGroup
 	NotifierWaitGroup sync.WaitGroup

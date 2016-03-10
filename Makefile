@@ -32,7 +32,7 @@ test:
 test-ci: test
 	gocovmerge main.txt checks.txt > coverage.txt
 	@go tool cover -html=coverage.txt -o coverage.html
-	@go tool cover -func=coverage.txt | grep "total:" | awk '{print $$3}' | sed -e 's/%//' > coverage.out
-	@bash -c 'COVERAGE=$$(cat coverage.out);	\
+	@go tool cover -func=coverage.txt | grep "total:" | awk '{print $$3}' | sed -e 's/%//' > cov_total.out
+	@bash -c 'COVERAGE=$$(cat cov_total.out);	\
 	echo "Current Coverage % is $$COVERAGE, expected is ${TEST_COVERAGE_THRESHOLD}.";	\
 	exit $$(echo $$COVERAGE"<${TEST_COVERAGE_THRESHOLD}" | bc -l)'

@@ -1,5 +1,5 @@
-hash: 5c82c5703699f6364b6a985e0b0151001a6dae87f1a0924f69dd4c49c5bb1b80
-updated: 2016-03-10T10:24:00.827540445+05:30
+hash: 336d9f1a8e0e42f124aaf62d5be94ca99c699afff322ef34174146b52bc61c87
+updated: 2016-03-10T14:16:26.109430958+05:30
 imports:
 - name: github.com/ashwanthkumar/golang-utils
   version: 6362d7ff76b62be7ac4ef53aad5812791b390974
@@ -42,8 +42,14 @@ imports:
   - assert
   - mock
   - http
+- name: github.com/wadey/gocovmerge
+  version: c01c9239511539a811674313e55794e950f3c7ab
 - name: golang.org/x/net
   version: a4bbce9fcae005b22ae5443f6af064d80a6f5a55
   subpackages:
   - publicsuffix
+- name: golang.org/x/tools
+  version: 093d7650abf0a26882924de03a6c840a00356572
+  subpackages:
+  - cover
 devImports: []

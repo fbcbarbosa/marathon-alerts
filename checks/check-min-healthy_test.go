@@ -1,4 +1,4 @@
-package main
+package checks
 
 import (
 	"testing"
@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// === MinInstances ===
-func TestMinInstancesWhenEverythingIsFine(t *testing.T) {
-	check := MinInstances{
+// === MinHealthyTasks ===
+func TestMinHealthyTasksWhenEverythingIsFine(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,
 	}
@@ -21,13 +21,13 @@ func TestMinInstancesWhenEverythingIsFine(t *testing.T) {
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Pass, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "We now have 100 healthy out of total 100", appCheck.Message)
 }
 
-func TestMinInstancesWhenWarningThresholdIsMet(t *testing.T) {
-	check := MinInstances{
+func TestMinHealthyTasksWhenWarningThresholdIsMet(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,
 	}
@@ -39,18 +39,18 @@ func TestMinInstancesWhenWarningThresholdIsMet(t *testing.T) {
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Warning, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 59 are healthy out of total 100", appCheck.Message)
 }
 
-func TestMinInstancesWhenWarningThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
-	check := MinInstances{
+func TestMinHealthyTasksWhenWarningThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.4,
 		DefaultWarningThreshold:  0.6,
 	}
 	appLabels := make(map[string]string)
-	appLabels["alerts.min-instances.warn.threshold"] = "0.5"
+	appLabels["alerts.min-healthy.warn.threshold"] = "0.5"
 	app := marathon.Application{
 		ID:           "/foo",
 		Instances:    100,
@@ -60,54 +60,52 @@ func TestMinInstancesWhenWarningThresholdIsMetButOverridenFromAppLabels(t *testi
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Pass, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "We now have 59 healthy out of total 100", appCheck.Message)
 }
 
-func TestMinInstancesWhenFailThresholdIsMet(t *testing.T) {
-	check := MinInstances{
+func TestMinHealthyTasksWhenFailThresholdIsMet(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,
 	}
 	app := marathon.Application{
 		ID:           "/foo",
 		Instances:    100,
-		TasksHealthy: 47,
-		TasksStaged:  2,
+		TasksHealthy: 49,
 	}
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Critical, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 49 are healthy out of total 100", appCheck.Message)
 }
 
-func TestMinInstancesWhenFailThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
-	check := MinInstances{
+func TestMinHealthyTasksWhenFailThresholdIsMetButOverridenFromAppLabels(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,
 	}
 	appLabels := make(map[string]string)
-	appLabels["alerts.min-instances.critical.threshold"] = "0.4"
+	appLabels["alerts.min-healthy.critical.threshold"] = "0.4"
 	app := marathon.Application{
 		ID:           "/foo",
 		Instances:    100,
-		TasksHealthy: 48,
-		TasksStaged:  1,
+		TasksHealthy: 49,
 		Labels:       appLabels,
 	}
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Warning, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 49 are healthy out of total 100", appCheck.Message)
 }
 
-func TestMinInstancesWhenNoTasksAreRunning(t *testing.T) {
-	check := MinInstances{
+func TestMinHealthyTasksWhenNoTasksAreRunning(t *testing.T) {
+	check := MinHealthyTasks{
 		DefaultCriticalThreshold: 0.5,
 		DefaultWarningThreshold:  0.6,
 	}
@@ -115,12 +113,11 @@ func TestMinInstancesWhenNoTasksAreRunning(t *testing.T) {
 		ID:           "/foo",
 		Instances:    1,
 		TasksHealthy: 0,
-		TasksStaged:  0,
 	}
 
 	appCheck := check.Check(app)
 	assert.Equal(t, Critical, appCheck.Result)
-	assert.Equal(t, "min-instances", appCheck.CheckName)
+	assert.Equal(t, "min-healthy", appCheck.CheckName)
 	assert.Equal(t, "/foo", appCheck.App)
 	assert.Equal(t, "Only 0 are healthy out of total 1", appCheck.Message)
 }

@@ -1,9 +1,10 @@
-package main
+package checks
 
 import (
 	"fmt"
-	"github.com/gambol99/go-marathon"
 	"time"
+
+	"github.com/gambol99/go-marathon"
 )
 
 type SuspendedCheck struct{}

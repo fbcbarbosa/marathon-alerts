@@ -6,14 +6,15 @@ import (
 	"time"
 
 	maps "github.com/ashwanthkumar/golang-utils/maps"
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	"github.com/rcrowley/go-metrics"
 )
 
 const AlertsEnabledLabel = "alerts.enabled"
 
 type AlertManager struct {
-	CheckerChan      chan AppCheck        // channel to get app check results
-	NotifierChan     chan AppCheck        // channel to send app check notifications
+	CheckerChan      chan checks.AppCheck // channel to get app check results
+	NotifierChan     chan checks.AppCheck // channel to send app check notifications
 	AppSuppress      map[string]time.Time // Key - AppName-CheckName-CheckResult
 	AlertCount       map[string]int       // Key - AppName-CheckName -> Consecutive # of failures
 	SuppressDuration time.Duration
@@ -26,7 +27,7 @@ func (a *AlertManager) Start() {
 	fmt.Println("Starting Alert Manager...")
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
-	a.NotifierChan = make(chan AppCheck)
+	a.NotifierChan = make(chan checks.AppCheck)
 	a.AppSuppress = make(map[string]time.Time)
 	a.AlertCount = make(map[string]int)
 	go a.run()
@@ -67,7 +68,7 @@ func (a *AlertManager) run() {
 	}
 }
 
-func (a *AlertManager) processCheck(check AppCheck) {
+func (a *AlertManager) processCheck(check checks.AppCheck) {
 	a.supressMutex.Lock()
 	defer a.supressMutex.Unlock()
 
@@ -76,10 +77,10 @@ func (a *AlertManager) processCheck(check AppCheck) {
 	if alertEnabled {
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
 
-		if checkExists && check.Result == Pass {
+		if checkExists && check.Result == checks.Pass {
 			a.AlertCount[keyPrefixIfCheckExists]++
 			check.Times = a.AlertCount[keyPrefixIfCheckExists]
-			check.Result = Resolved
+			check.Result = checks.Resolved
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
 			a.NotifierChan <- check
@@ -92,7 +93,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			check.Times = a.AlertCount[keyPrefixIfCheckExists]
 			a.NotifierChan <- check
 			a.incNotifCounter(check)
-		} else if !checkExists && check.Result != Pass {
+		} else if !checkExists && check.Result != checks.Pass {
 			keyPrefix := a.keyPrefix(check)
 			key := a.key(check, check.Result)
 			a.AppSuppress[key] = check.Timestamp
@@ -105,7 +106,7 @@ func (a *AlertManager) processCheck(check AppCheck) {
 			check.Times = a.AlertCount[keyPrefix]
 			a.NotifierChan <- check
 			a.incNotifCounter(check)
-		} else if !checkExists && check.Result == Pass {
+		} else if !checkExists && check.Result == checks.Pass {
 			keyPrefix := a.keyPrefix(check)
 			delete(a.AlertCount, keyPrefix)
 		}
@@ -114,8 +115,8 @@ func (a *AlertManager) processCheck(check AppCheck) {
 	}
 }
 
-func (a *AlertManager) checkExist(check AppCheck) (bool, string, string, CheckStatus) {
-	for _, level := range CheckLevels {
+func (a *AlertManager) checkExist(check checks.AppCheck) (bool, string, string, checks.CheckStatus) {
+	for _, level := range checks.CheckLevels {
 		keyPrefix := a.keyPrefix(check)
 		key := a.key(check, level)
 		_, present := a.AppSuppress[key]
@@ -124,30 +125,30 @@ func (a *AlertManager) checkExist(check AppCheck) (bool, string, string, CheckSt
 		}
 	}
 
-	return false, "", "", Pass
+	return false, "", "", checks.Pass
 }
 
-func (a *AlertManager) key(check AppCheck, level CheckStatus) string {
+func (a *AlertManager) key(check checks.AppCheck, level checks.CheckStatus) string {
 	return fmt.Sprintf("%s-%d", a.keyPrefix(check), level)
 }
 
-func (a *AlertManager) keyPrefix(check AppCheck) string {
+func (a *AlertManager) keyPrefix(check checks.AppCheck) string {
 	return fmt.Sprintf("%s-%s", check.App, check.CheckName)
 }
 
-func (a *AlertManager) incNotifCounter(check AppCheck) {
+func (a *AlertManager) incNotifCounter(check checks.AppCheck) {
 	metrics.GetOrRegisterCounter("notifications-total", nil).Inc(1)
 	metrics.GetOrRegisterMeter("notifications-rate", nil).Mark(1)
-	if check.Result == Warning {
+	if check.Result == checks.Warning {
 		metrics.GetOrRegisterCounter("notifications-warning", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-warning-rate", DebugMetricsRegistry).Mark(1)
-	} else if check.Result == Critical {
+	} else if check.Result == checks.Critical {
 		metrics.GetOrRegisterCounter("notifications-critical", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-critical-rate", DebugMetricsRegistry).Mark(1)
-	} else if check.Result == Pass {
+	} else if check.Result == checks.Pass {
 		metrics.GetOrRegisterCounter("notifications-pass", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-pass-rate", DebugMetricsRegistry).Mark(1)
-	} else if check.Result == Resolved {
+	} else if check.Result == checks.Resolved {
 		metrics.GetOrRegisterCounter("notifications-resolved", nil).Inc(1)
 		metrics.GetOrRegisterMeter("notifications-resolved-rate", DebugMetricsRegistry).Mark(1)
 	} else {

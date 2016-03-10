@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
+	"github.com/ashwanthkumar/marathon-alerts/notifiers"
 	flag "github.com/spf13/pflag"
 
 	marathon "github.com/gambol99/go-marathon"
@@ -56,16 +58,16 @@ func main() {
 	}
 	DebugMetricsRegistry = metrics.NewPrefixedRegistry("debug")
 
-	minHealthyTasks := &MinHealthyTasks{
+	minHealthyTasks := &checks.MinHealthyTasks{
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
 		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
-	minInstances := &MinInstances{
+	minInstances := &checks.MinInstances{
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
 		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
-	suspendedCheck := &SuspendedCheck{}
-	checks := []Checker{minHealthyTasks, minInstances, suspendedCheck}
+	suspendedCheck := &checks.SuspendedCheck{}
+	checks := []checks.Checker{minHealthyTasks, minInstances, suspendedCheck}
 
 	appChecker = AppChecker{
 		Client:        client,
@@ -80,16 +82,16 @@ func main() {
 	}
 	alertManager.Start()
 
-	var notifiers []Notifier
-	slack := Slack{
+	var allNotifiers []notifiers.Notifier
+	slack := notifiers.Slack{
 		Webhook: slackWebhooks,
 		Channel: slackChannel,
 		Owners:  slackOwners,
 	}
-	notifiers = append(notifiers, &slack)
+	allNotifiers = append(allNotifiers, &slack)
 	notifyManager = NotifyManager{
 		AlertChan: alertManager.NotifierChan,
-		Notifiers: notifiers,
+		Notifiers: allNotifiers,
 	}
 	notifyManager.Start()
 	metrics.RegisterDebugGCStats(DebugMetricsRegistry)

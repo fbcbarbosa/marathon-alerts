@@ -9,6 +9,7 @@ import (
 
 	maps "github.com/ashwanthkumar/golang-utils/maps"
 	sets "github.com/ashwanthkumar/golang-utils/sets"
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	marathon "github.com/gambol99/go-marathon"
 	"github.com/rcrowley/go-metrics"
 )
@@ -18,24 +19,13 @@ const (
 	SubscribeAllChecks     = "all"
 )
 
-type CheckStatus uint8
-
-const (
-	Pass     = CheckStatus(99)
-	Resolved = CheckStatus(98)
-	Warning  = CheckStatus(2)
-	Critical = CheckStatus(1)
-)
-
-var CheckLevels = [...]CheckStatus{Warning, Critical}
-
 type AppChecker struct {
 	Client        marathon.Marathon
 	RunWaitGroup  sync.WaitGroup
 	CheckInterval time.Duration
 	stopChannel   chan bool
-	Checks        []Checker
-	AlertsChannel chan AppCheck
+	Checks        []checks.Checker
+	AlertsChannel chan checks.AppCheck
 	// Snooze the entire system for some Time
 	// Useful if we don't want to SPAM the notifications
 	// when doing maintenance of mesos cluster
@@ -49,7 +39,7 @@ func (a *AppChecker) Start() {
 	fmt.Println("Starting App Checker...")
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
-	a.AlertsChannel = make(chan AppCheck)
+	a.AlertsChannel = make(chan checks.AppCheck)
 
 	a.IsSnoozed = false
 

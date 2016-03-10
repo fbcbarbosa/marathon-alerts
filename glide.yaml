@@ -13,3 +13,4 @@ import:
   - mock
 - package: github.com/rcrowley/go-metrics
 - package: github.com/ryanuber/go-glob
+- package: github.com/wadey/gocovmerge

@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	flag "github.com/spf13/pflag"
 
 	marathon "github.com/gambol99/go-marathon"
@@ -56,16 +57,16 @@ func main() {
 	}
 	DebugMetricsRegistry = metrics.NewPrefixedRegistry("debug")
 
-	minHealthyTasks := &MinHealthyTasks{
+	minHealthyTasks := &checks.MinHealthyTasks{
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
 		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
-	minInstances := &MinInstances{
+	minInstances := &checks.MinInstances{
 		DefaultCriticalThreshold: minHealthyCriticalThreshold,
 		DefaultWarningThreshold:  minHealthyWarningThreshold,
 	}
-	suspendedCheck := &SuspendedCheck{}
-	checks := []Checker{minHealthyTasks, minInstances, suspendedCheck}
+	suspendedCheck := &checks.SuspendedCheck{}
+	checks := []checks.Checker{minHealthyTasks, minInstances, suspendedCheck}
 
 	appChecker = AppChecker{
 		Client:        client,

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	marathon "github.com/gambol99/go-marathon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -19,16 +20,16 @@ func TestProcessCheckForAllSubscribers(t *testing.T) {
 	var urlValues url.Values
 	client.On("Applications", urlValues).Return(&apps, nil)
 
-	alertChan := make(chan AppCheck, 1)
+	alertChan := make(chan checks.AppCheck, 1)
 	check, now := CreateMockChecker(appLabels)
 
 	appChecker := AppChecker{
 		Client:        client,
 		AlertsChannel: alertChan,
-		Checks:        []Checker{check},
+		Checks:        []checks.Checker{check},
 	}
 
-	expectedCheck := AppCheck{Result: Critical, Timestamp: now, App: "/foo-app", Labels: appLabels}
+	expectedCheck := checks.AppCheck{Result: checks.Critical, Timestamp: now, App: "/foo-app", Labels: appLabels}
 	err := appChecker.processChecks()
 	assert.Nil(t, err)
 	assert.Len(t, alertChan, 1)
@@ -46,13 +47,13 @@ func TestProcessCheckForWithNoSubscribers(t *testing.T) {
 	var urlValues url.Values
 	client.On("Applications", urlValues).Return(&apps, nil)
 
-	alertChan := make(chan AppCheck, 1)
+	alertChan := make(chan checks.AppCheck, 1)
 	check, _ := CreateMockChecker(appLabels)
 
 	appChecker := AppChecker{
 		Client:        client,
 		AlertsChannel: alertChan,
-		Checks:        []Checker{check},
+		Checks:        []checks.Checker{check},
 	}
 
 	err := appChecker.processChecks()
@@ -60,12 +61,12 @@ func TestProcessCheckForWithNoSubscribers(t *testing.T) {
 	assert.Len(t, alertChan, 0)
 }
 
-func CreateMockChecker(appLabels map[string]string) (Checker, time.Time) {
+func CreateMockChecker(appLabels map[string]string) (checks.Checker, time.Time) {
 	now := time.Now()
 	check := new(MockChecker)
 	check.On("Name").Return("mock-check")
-	check.On("Check", mock.AnythingOfType("Application")).Return(AppCheck{
-		Result:    Critical,
+	check.On("Check", mock.AnythingOfType("Application")).Return(checks.AppCheck{
+		Result:    checks.Critical,
 		Timestamp: now,
 		App:       "/foo-app",
 		Labels:    appLabels,

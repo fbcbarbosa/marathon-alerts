@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"sync"
+
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 )
 
 type Notifier interface {
-	Notify(check AppCheck)
+	Notify(check checks.AppCheck)
 	Name() string
 }
 
 type NotifyManager struct {
 	// channel to get checks for notification
-	AlertChan chan AppCheck
+	AlertChan chan checks.AppCheck
 	Notifiers []Notifier
 
 	RunWaitGroup      sync.WaitGroup
@@ -34,7 +36,7 @@ func (n *NotifyManager) Stop() {
 	n.RunWaitGroup.Done()
 }
 
-func (n *NotifyManager) Notify(check AppCheck) {
+func (n *NotifyManager) Notify(check checks.AppCheck) {
 	n.NotifierWaitGroup.Add(1)
 	// Send the notifications for check
 	for _, notifier := range n.Notifiers {

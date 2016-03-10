@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	maps "github.com/ashwanthkumar/golang-utils/maps"
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	"github.com/ashwanthkumar/slack-go-webhook"
 )
 
@@ -18,7 +19,7 @@ func (s *Slack) Name() string {
 	return "slack"
 }
 
-func (s *Slack) Notify(check AppCheck) {
+func (s *Slack) Notify(check checks.AppCheck) {
 	attachment := slack.Attachment{
 		Text:  &check.Message,
 		Color: s.resultToColor(check.Result),
@@ -40,9 +41,9 @@ func (s *Slack) Notify(check AppCheck) {
 	}
 
 	alertSuffix := "Please check!"
-	if check.Result == Resolved {
+	if check.Result == checks.Resolved {
 		alertSuffix = "Check Resolved, thanks!"
-	} else if check.Result == Pass {
+	} else if check.Result == checks.Pass {
 		alertSuffix = "Check Passed"
 	}
 	mainText := fmt.Sprintf("%s, %s", s.parseOwners(owners), alertSuffix)
@@ -63,30 +64,30 @@ func (s *Slack) Notify(check AppCheck) {
 	}
 }
 
-func (s *Slack) resultToColor(result CheckStatus) *string {
+func (s *Slack) resultToColor(result checks.CheckStatus) *string {
 	color := "black"
 	switch {
-	case Pass == result || Resolved == result:
+	case checks.Pass == result || checks.Resolved == result:
 		color = "good"
-	case Warning == result:
+	case checks.Warning == result:
 		color = "warning"
-	case Critical == result:
+	case checks.Critical == result:
 		color = "danger"
 	}
 
 	return &color
 }
 
-func (s *Slack) resultToString(result CheckStatus) string {
+func (s *Slack) resultToString(result checks.CheckStatus) string {
 	value := "Unknown"
 	switch result {
-	case Pass:
+	case checks.Pass:
 		value = "Passed"
-	case Resolved:
+	case checks.Resolved:
 		value = "Resolved"
-	case Warning:
+	case checks.Warning:
 		value = "Warning"
-	case Critical:
+	case checks.Critical:
 		value = "Critical"
 	}
 

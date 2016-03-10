@@ -4,21 +4,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestKey(t *testing.T) {
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
 	}
 	mgr := AlertManager{}
-	key := mgr.key(check, Pass)
+	key := mgr.key(check, checks.Pass)
 	assert.Equal(t, "/foo-check-name-99", key)
 }
 
 func TestKeyPrefix(t *testing.T) {
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
 	}
@@ -30,10 +31,10 @@ func TestKeyPrefix(t *testing.T) {
 func TestCheckExists(t *testing.T) {
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Warning,
+		Result:    checks.Warning,
 	}
 	mgr := AlertManager{
 		AppSuppress: suppressedApps,
@@ -43,16 +44,16 @@ func TestCheckExists(t *testing.T) {
 	assert.True(t, true, exist)
 	assert.Equal(t, "/foo-check-name", keyPrefixIfExist)
 	assert.Equal(t, "/foo-check-name-2", keyIfExist)
-	assert.Equal(t, Warning, checkLevel)
+	assert.Equal(t, checks.Warning, checkLevel)
 }
 
 func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Warning,
+		Result:    checks.Warning,
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
@@ -64,18 +65,18 @@ func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
 	actualCheck := <-notifierChannel
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, Warning, actualCheck.Result)
+	assert.Equal(t, checks.Warning, actualCheck.Result)
 	assert.Equal(t, 1, actualCheck.Times)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
 func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Pass,
+		Result:    checks.Pass,
 	}
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 2
@@ -91,13 +92,13 @@ func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
 }
 
 func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Critical,
+		Result:    checks.Critical,
 	}
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
@@ -112,21 +113,21 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	actualCheck := <-notifierChannel
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, Critical, actualCheck.Result)
+	assert.Equal(t, checks.Critical, actualCheck.Result)
 	assert.Equal(t, 2, actualCheck.Times)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 2)
 }
 
 func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Warning,
+		Result:    checks.Warning,
 	}
 	mgr := AlertManager{
 		AppSuppress:  suppressedApps,
@@ -140,13 +141,13 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 }
 
 func TestProcessCheckWhenResolvedCheckArrives(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Pass,
+		Result:    checks.Pass,
 	}
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
@@ -161,21 +162,21 @@ func TestProcessCheckWhenResolvedCheckArrives(t *testing.T) {
 	actualCheck := <-notifierChannel
 	assert.Equal(t, "/foo", actualCheck.App)
 	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, Resolved, actualCheck.Result)
+	assert.Equal(t, checks.Resolved, actualCheck.Result)
 	assert.Equal(t, 2, actualCheck.Times)
 	// We remove AlertCount upon Resolved check
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
 }
 
 func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 1)
+	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
 	appLabels := make(map[string]string)
 	appLabels["alerts.enabled"] = "false"
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Warning,
+		Result:    checks.Warning,
 		Labels:    appLabels,
 	}
 	mgr := AlertManager{
@@ -189,7 +190,7 @@ func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
 }
 
 func TestCleanUpSupressedAlerts(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan checks.AppCheck)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now().Add(-5 * time.Minute)
 	mgr := AlertManager{
@@ -205,7 +206,7 @@ func TestCleanUpSupressedAlerts(t *testing.T) {
 }
 
 func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
-	notifierChannel := make(chan AppCheck)
+	notifierChannel := make(chan checks.AppCheck)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now().Add(-5 * time.Minute)
 	mgr := AlertManager{
@@ -221,7 +222,7 @@ func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
 }
 
 func TestTimesCountAfterTheCheckHasBeenIdleForSuppressedDuration(t *testing.T) {
-	notifierChannel := make(chan AppCheck, 2)
+	notifierChannel := make(chan checks.AppCheck, 2)
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
 	suppressedApps := make(map[string]time.Time)
@@ -232,10 +233,10 @@ func TestTimesCountAfterTheCheckHasBeenIdleForSuppressedDuration(t *testing.T) {
 		AlertCount:       alertCount,
 		SuppressDuration: 10 * time.Minute,
 	}
-	check := AppCheck{
+	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
-		Result:    Critical,
+		Result:    checks.Critical,
 	}
 
 	// When Times 1

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ashwanthkumar/marathon-alerts/checks"
+	"github.com/ashwanthkumar/marathon-alerts/notifiers"
 	flag "github.com/spf13/pflag"
 
 	marathon "github.com/gambol99/go-marathon"
@@ -81,16 +82,16 @@ func main() {
 	}
 	alertManager.Start()
 
-	var notifiers []Notifier
-	slack := Slack{
+	var allNotifiers []Notifier
+	slack := notifiers.Slack{
 		Webhook: slackWebhooks,
 		Channel: slackChannel,
 		Owners:  slackOwners,
 	}
-	notifiers = append(notifiers, &slack)
+	allNotifiers = append(allNotifiers, &slack)
 	notifyManager = NotifyManager{
 		AlertChan: alertManager.NotifierChan,
-		Notifiers: notifiers,
+		Notifiers: allNotifiers,
 	}
 	notifyManager.Start()
 	metrics.RegisterDebugGCStats(DebugMetricsRegistry)

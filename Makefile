@@ -29,6 +29,7 @@ test:
 	go test ${TESTFLAGS} -coverprofile=main.txt github.com/ashwanthkumar/marathon-alerts/
 	go test ${TESTFLAGS} -coverprofile=checks.txt github.com/ashwanthkumar/marathon-alerts/checks
 	go test ${TESTFLAGS} -coverprofile=notifiers.txt github.com/ashwanthkumar/marathon-alerts/notifiers
+	go test ${TESTFLAGS} -coverprofile=routes.txt github.com/ashwanthkumar/marathon-alerts/routes
 
 test-ci: test
 	gocovmerge *.txt > coverage.txt

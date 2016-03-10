@@ -1,8 +1,9 @@
-package main
+package routes
 
 import (
 	"testing"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +15,7 @@ func TestSimpleParseRoutes(t *testing.T) {
 	route := routes[0]
 	expectedRoute := Route{
 		Check:      "min-healthy",
-		CheckLevel: Warning,
+		CheckLevel: checks.Warning,
 		Notifier:   "slack",
 	}
 
@@ -35,7 +36,7 @@ func TestParseRoutesForMultipleRoutes(t *testing.T) {
 	route := routes[0]
 	expectedRoute := Route{
 		Check:      "min-healthy",
-		CheckLevel: Warning,
+		CheckLevel: checks.Warning,
 		Notifier:   "slack",
 	}
 	assert.Equal(t, expectedRoute, route)
@@ -43,7 +44,7 @@ func TestParseRoutesForMultipleRoutes(t *testing.T) {
 	route = routes[1]
 	expectedRoute = Route{
 		Check:      "min-healthy",
-		CheckLevel: Critical,
+		CheckLevel: checks.Critical,
 		Notifier:   "slack",
 	}
 	assert.Equal(t, expectedRoute, route)
@@ -56,22 +57,23 @@ func TestParseInvalidCheckLevel(t *testing.T) {
 }
 
 func TestParseCheckLevel(t *testing.T) {
-	expected := make(map[string]CheckStatus)
-	expected["Warning"] = Warning
-	expected["WARNING"] = Warning
-	expected["warning"] = Warning
-	expected["WaRnInG"] = Warning
-	expected["Critical"] = Critical
-	expected["CRITICAL"] = Critical
-	expected["critical"] = Critical
-	expected["CrItIcAl"] = Critical
-	expected["Pass"] = Pass
-	expected["pass"] = Pass
-	expected["PASS"] = Pass
-	expected["PaSs"] = Pass
-	expected["Resolved"] = Resolved
-	expected["RESOLVED"] = Resolved
-	expected["ReSoLvEd"] = Resolved
+	expected := make(map[string]checks.CheckStatus)
+	expected["Warning"] = checks.Warning
+	expected["WARNING"] = checks.Warning
+	expected["warning"] = checks.Warning
+	expected["WaRnInG"] = checks.Warning
+	expected["Critical"] = checks.Critical
+	expected["CRITICAL"] = checks.Critical
+	expected["critical"] = checks.Critical
+	expected["CrItIcAl"] = checks.Critical
+	expected["Pass"] = checks.Pass
+	expected["pass"] = checks.Pass
+	expected["PASS"] = checks.Pass
+	expected["PaSs"] = checks.Pass
+	expected["Resolved"] = checks.Resolved
+	expected["resolved"] = checks.Resolved
+	expected["RESOLVED"] = checks.Resolved
+	expected["ReSoLvEd"] = checks.Resolved
 	for input, expectedOutput := range expected {
 		output, err := parseCheckLevel(input)
 		assert.NoError(t, err)
@@ -89,7 +91,7 @@ func TestDefaultRoutes(t *testing.T) {
 	allWarningRoute := defaultRoutes[0]
 	expectedWarningRoute := Route{
 		Check:      "*",
-		CheckLevel: Warning,
+		CheckLevel: checks.Warning,
 		Notifier:   "*",
 	}
 	assert.Equal(t, expectedWarningRoute, allWarningRoute)
@@ -97,7 +99,7 @@ func TestDefaultRoutes(t *testing.T) {
 	allCriticalRoute := defaultRoutes[1]
 	expectedCriticalRoute := Route{
 		Check:      "*",
-		CheckLevel: Critical,
+		CheckLevel: checks.Critical,
 		Notifier:   "*",
 	}
 	assert.Equal(t, expectedCriticalRoute, allCriticalRoute)
@@ -109,17 +111,17 @@ func TestRouteMatch(t *testing.T) {
 	assert.Len(t, defaultRoutes, 2)
 
 	allWarningRoute := defaultRoutes[0]
-	warningCheck := AppCheck{
+	warningCheck := checks.AppCheck{
 		CheckName: "check-name",
-		Result:    Warning,
+		Result:    checks.Warning,
 	}
 	warningCheckMatch := allWarningRoute.Match(warningCheck)
 	assert.True(t, warningCheckMatch)
 
 	allCriticalRoute := defaultRoutes[1]
-	criticalCheck := AppCheck{
+	criticalCheck := checks.AppCheck{
 		CheckName: "check-name",
-		Result:    Critical,
+		Result:    checks.Critical,
 	}
 	criticalCheckMatch := allCriticalRoute.Match(criticalCheck)
 	assert.True(t, criticalCheckMatch)
@@ -131,9 +133,9 @@ func TestRouteMatchDoesNotWork(t *testing.T) {
 	assert.Len(t, defaultRoutes, 2)
 
 	allWarningRoute := defaultRoutes[0]
-	resolvedCheck := AppCheck{
+	resolvedCheck := checks.AppCheck{
 		CheckName: "check-name",
-		Result:    Resolved,
+		Result:    checks.Resolved,
 	}
 	resolvedCheckMatch := allWarningRoute.Match(resolvedCheck)
 	assert.False(t, resolvedCheckMatch)

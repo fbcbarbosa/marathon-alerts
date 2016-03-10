@@ -1,9 +1,10 @@
-package main
+package routes
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/ashwanthkumar/marathon-alerts/checks"
 	"github.com/ryanuber/go-glob"
 )
 
@@ -18,11 +19,11 @@ var DefaultRoutes = "*/warning/*;*/critical/*"
 // 	`*/warning/*` and `*/critical/*` and `*/resolved/*`
 type Route struct {
 	Check      string
-	CheckLevel CheckStatus
+	CheckLevel checks.CheckStatus
 	Notifier   string
 }
 
-func (r *Route) Match(check AppCheck) bool {
+func (r *Route) Match(check checks.AppCheck) bool {
 	nameMatches := glob.Glob(r.Check, check.CheckName)
 	checkLevelMatches := r.CheckLevel == check.Result
 	return nameMatches && checkLevelMatches
@@ -50,17 +51,17 @@ func ParseRoutes(routes string) ([]Route, error) {
 	return finalRoutes, nil
 }
 
-func parseCheckLevel(checkLevel string) (CheckStatus, error) {
+func parseCheckLevel(checkLevel string) (checks.CheckStatus, error) {
 	switch strings.ToLower(checkLevel) {
 	case "warning":
-		return Warning, nil
+		return checks.Warning, nil
 	case "critical":
-		return Critical, nil
+		return checks.Critical, nil
 	case "pass":
-		return Pass, nil
+		return checks.Pass, nil
 	case "resolved":
-		return Resolved, nil
+		return checks.Resolved, nil
 	default:
-		return Critical, fmt.Errorf("Expected one of warning / critical / pass / resolved but %s found", strings.ToLower(checkLevel))
+		return checks.Critical, fmt.Errorf("Expected one of warning / critical / pass / resolved but %s found", strings.ToLower(checkLevel))
 	}
 }

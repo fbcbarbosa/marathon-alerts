@@ -6,6 +6,7 @@ PID
 cover.out
 coverage.html
 coverage.txt
-coverage.out
+cov_total.out
 checks.txt
 main.txt
+notifiers.txt

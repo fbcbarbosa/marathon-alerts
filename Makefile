@@ -1,7 +1,7 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
 TESTFLAGS=-v -cover -covermode=atomic
-TEST_COVERAGE_THRESHOLD=51.0
+TEST_COVERAGE_THRESHOLD=48.0
 
 build:
 	go build -tags netgo -ldflags "-w" -o ${APPNAME} .

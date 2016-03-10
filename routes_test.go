@@ -102,3 +102,39 @@ func TestDefaultRoutes(t *testing.T) {
 	}
 	assert.Equal(t, expectedCriticalRoute, allCriticalRoute)
 }
+
+func TestRouteMatch(t *testing.T) {
+	defaultRoutes, err := ParseRoutes(DefaultRoutes)
+	assert.NoError(t, err)
+	assert.Len(t, defaultRoutes, 2)
+
+	allWarningRoute := defaultRoutes[0]
+	warningCheck := AppCheck{
+		CheckName: "check-name",
+		Result:    Warning,
+	}
+	warningCheckMatch := allWarningRoute.Match(warningCheck)
+	assert.True(t, warningCheckMatch)
+
+	allCriticalRoute := defaultRoutes[1]
+	criticalCheck := AppCheck{
+		CheckName: "check-name",
+		Result:    Critical,
+	}
+	criticalCheckMatch := allCriticalRoute.Match(criticalCheck)
+	assert.True(t, criticalCheckMatch)
+}
+
+func TestRouteMatchDoesNotWork(t *testing.T) {
+	defaultRoutes, err := ParseRoutes(DefaultRoutes)
+	assert.NoError(t, err)
+	assert.Len(t, defaultRoutes, 2)
+
+	allWarningRoute := defaultRoutes[0]
+	resolvedCheck := AppCheck{
+		CheckName: "check-name",
+		Result:    Resolved,
+	}
+	resolvedCheckMatch := allWarningRoute.Match(resolvedCheck)
+	assert.False(t, resolvedCheckMatch)
+}

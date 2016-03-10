@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"github.com/ryanuber/go-glob"
 )
 
 var DefaultRoutes = "*/warning/*;*/critical/*"
@@ -18,6 +20,12 @@ type Route struct {
 	Check      string
 	CheckLevel CheckStatus
 	Notifier   string
+}
+
+func (r *Route) Match(check AppCheck) bool {
+	nameMatches := glob.Glob(r.Check, check.CheckName)
+	checkLevelMatches := r.CheckLevel == check.Result
+	return nameMatches && checkLevelMatches
 }
 
 func ParseRoutes(routes string) ([]Route, error) {

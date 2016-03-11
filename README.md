@@ -39,7 +39,7 @@ Apart from the flags that are used while starting up, the functionality can be c
 |  ---    |   ---      |  ---    |
 | alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
 | alerts.checks.subscribe  | Comma separated list of checks that needs to be run. Defaults - all | all |
-| alerts.routes  | We now have an ability to route different checks to different notifiers based on check level. See the section below on Routes to understand how you can add routes to your apps. Defaults - `*/resolved/*;*/warning/*;*/critical/*` | min-healthy/critical/pagerduty;min-healthy/warning/slack |
+| alerts.routes  | Ability to route different checks to different notifiers based on their level. See the section below on Routes to understand how you can add routes to your apps. Defaults - `*/resolved/*;*/warning/*;*/critical/*` | min-healthy/critical/pagerduty;min-healthy/warning/slack |
 | alerts.min-healthy.critical.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-critical-threshold` | 0.5 |
 | alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
 | alerts.min-instances.critical.threshold  | Failure threshold for min-instances check. Defaults - `--check-min-instances-critical-threshold` | 0.5 |

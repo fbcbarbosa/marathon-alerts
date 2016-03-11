@@ -37,6 +37,9 @@ func ParseRoutes(routes string) ([]Route, error) {
 	var finalRoutes []Route
 	routesAsString := strings.Split(routes, ";")
 	for _, routeAsString := range routesAsString {
+		if routes != "" && routeAsString == "" {
+			continue
+		}
 		segments := strings.Split(routeAsString, "/")
 		if len(segments) != 3 {
 			return nil, fmt.Errorf("Expected 3 parts in %s, separated by `/` but %d found", routeAsString, len(segments))

@@ -22,6 +22,21 @@ func TestSimpleParseRoutes(t *testing.T) {
 	assert.Equal(t, expectedRoute, route)
 }
 
+func TestSimpleParseRoutesEndingWithSemiColon(t *testing.T) {
+	routeString := "min-healthy/warning/slack;"
+	routes, err := ParseRoutes(routeString)
+	assert.NoError(t, err)
+	assert.Len(t, routes, 1)
+	route := routes[0]
+	expectedRoute := Route{
+		Check:      "min-healthy",
+		CheckLevel: checks.Warning,
+		Notifier:   "slack",
+	}
+
+	assert.Equal(t, expectedRoute, route)
+}
+
 func TestParseRoutesForEmptyString(t *testing.T) {
 	routes, err := ParseRoutes("")
 	assert.Error(t, err)

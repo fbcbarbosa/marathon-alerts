@@ -7,17 +7,22 @@ import (
 
 	maps "github.com/ashwanthkumar/golang-utils/maps"
 	"github.com/ashwanthkumar/marathon-alerts/checks"
+	"github.com/ashwanthkumar/marathon-alerts/notifiers"
+	"github.com/ashwanthkumar/marathon-alerts/routes"
 	"github.com/rcrowley/go-metrics"
 )
 
-const AlertsEnabledLabel = "alerts.enabled"
+const (
+	AlertsEnabledLabel = "alerts.enabled"
+	AppRoutesLabel     = "alerts.routes"
+)
 
 type AlertManager struct {
 	CheckerChan      chan checks.AppCheck // channel to get app check results
-	NotifierChan     chan checks.AppCheck // channel to send app check notifications
 	AppSuppress      map[string]time.Time // Key - AppName-CheckName-CheckResult
 	AlertCount       map[string]int       // Key - AppName-CheckName -> Consecutive # of failures
 	SuppressDuration time.Duration
+	Notifiers        []notifiers.Notifier
 	RunWaitGroup     sync.WaitGroup
 	stopChannel      chan bool
 	supressMutex     sync.Mutex
@@ -27,7 +32,6 @@ func (a *AlertManager) Start() {
 	fmt.Println("Starting Alert Manager...")
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
-	a.NotifierChan = make(chan checks.AppCheck)
 	a.AppSuppress = make(map[string]time.Time)
 	a.AlertCount = make(map[string]int)
 	go a.run()
@@ -75,6 +79,11 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 	alertEnabled := maps.GetBoolean(check.Labels, AlertsEnabledLabel, true)
 
 	if alertEnabled {
+		allRoutes, err := routes.ParseRoutes(maps.GetString(check.Labels, AppRoutesLabel, routes.DefaultRoutes))
+		if err != nil {
+			fmt.Printf("Error - %v\n", err)
+			return
+		}
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
 
 		if checkExists && check.Result == checks.Pass {
@@ -83,7 +92,7 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 			check.Result = checks.Resolved
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
-			a.NotifierChan <- check
+			a.notifyCheck(check, allRoutes)
 			a.incNotifCounter(check)
 		} else if checkExists && check.Result != resultIfCheckExists {
 			delete(a.AppSuppress, keyIfCheckExists)
@@ -91,7 +100,7 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 			a.AppSuppress[key] = check.Timestamp
 			a.AlertCount[keyPrefixIfCheckExists]++
 			check.Times = a.AlertCount[keyPrefixIfCheckExists]
-			a.NotifierChan <- check
+			a.notifyCheck(check, allRoutes)
 			a.incNotifCounter(check)
 		} else if !checkExists && check.Result != checks.Pass {
 			keyPrefix := a.keyPrefix(check)
@@ -104,7 +113,7 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 				a.AlertCount[keyPrefix] = 1
 			}
 			check.Times = a.AlertCount[keyPrefix]
-			a.NotifierChan <- check
+			a.notifyCheck(check, allRoutes)
 			a.incNotifCounter(check)
 		} else if !checkExists && check.Result == checks.Pass {
 			keyPrefix := a.keyPrefix(check)
@@ -112,6 +121,18 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 		}
 	} else {
 		fmt.Printf("Monitoring disabled for %s via alerts.enabled label in app config\n", check.App)
+	}
+}
+
+func (a *AlertManager) notifyCheck(check checks.AppCheck, allRoutes []routes.Route) {
+	for _, route := range allRoutes {
+		if route.Match(check) {
+			for _, notifier := range a.Notifiers {
+				if route.MatchNotifier(notifier.Name()) {
+					notifier.Notify(check)
+				}
+			}
+		}
 	}
 }
 

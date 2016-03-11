@@ -8,7 +8,7 @@ import (
 	"github.com/ryanuber/go-glob"
 )
 
-var DefaultRoutes = "*/warning/*;*/critical/*"
+var DefaultRoutes = "*/warning/*;*/critical/*;*/resolved/*"
 
 // Routes holds the routing information for every checks, alert level combination which Notifier
 // should be used.
@@ -27,6 +27,10 @@ func (r *Route) Match(check checks.AppCheck) bool {
 	nameMatches := glob.Glob(r.Check, check.CheckName)
 	checkLevelMatches := r.CheckLevel == check.Result
 	return nameMatches && checkLevelMatches
+}
+
+func (r *Route) MatchNotifier(notifier string) bool {
+	return glob.Glob(r.Notifier, notifier)
 }
 
 func ParseRoutes(routes string) ([]Route, error) {

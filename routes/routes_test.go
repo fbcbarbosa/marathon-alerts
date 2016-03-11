@@ -87,7 +87,7 @@ func TestParseCheckLevel(t *testing.T) {
 func TestDefaultRoutes(t *testing.T) {
 	defaultRoutes, err := ParseRoutes(DefaultRoutes)
 	assert.NoError(t, err)
-	assert.Len(t, defaultRoutes, 2)
+	assert.Len(t, defaultRoutes, 3)
 	allWarningRoute := defaultRoutes[0]
 	expectedWarningRoute := Route{
 		Check:      "*",
@@ -103,12 +103,20 @@ func TestDefaultRoutes(t *testing.T) {
 		Notifier:   "*",
 	}
 	assert.Equal(t, expectedCriticalRoute, allCriticalRoute)
+
+	allResolvedRoute := defaultRoutes[2]
+	expectedResolvedRoute := Route{
+		Check:      "*",
+		CheckLevel: checks.Resolved,
+		Notifier:   "*",
+	}
+	assert.Equal(t, expectedResolvedRoute, allResolvedRoute)
 }
 
 func TestRouteMatch(t *testing.T) {
 	defaultRoutes, err := ParseRoutes(DefaultRoutes)
 	assert.NoError(t, err)
-	assert.Len(t, defaultRoutes, 2)
+	assert.Len(t, defaultRoutes, 3)
 
 	allWarningRoute := defaultRoutes[0]
 	warningCheck := checks.AppCheck{
@@ -130,7 +138,7 @@ func TestRouteMatch(t *testing.T) {
 func TestRouteMatchDoesNotWork(t *testing.T) {
 	defaultRoutes, err := ParseRoutes(DefaultRoutes)
 	assert.NoError(t, err)
-	assert.Len(t, defaultRoutes, 2)
+	assert.Len(t, defaultRoutes, 3)
 
 	allWarningRoute := defaultRoutes[0]
 	resolvedCheck := checks.AppCheck{
@@ -139,4 +147,39 @@ func TestRouteMatchDoesNotWork(t *testing.T) {
 	}
 	resolvedCheckMatch := allWarningRoute.Match(resolvedCheck)
 	assert.False(t, resolvedCheckMatch)
+}
+
+func TestRouteMatchNotifier(t *testing.T) {
+	route := Route{
+		Notifier: "*",
+	}
+	assert.True(t, route.MatchNotifier("slack"))
+}
+
+func BenchmarkSimpleParseRoutes(b *testing.B) {
+	routeString := "min-healthy/warning/slack"
+	for i := 0; i < b.N; i++ {
+		ParseRoutes(routeString)
+	}
+}
+
+func BenchmarkParseRoutesFor2Routes(b *testing.B) {
+	routeString := "min-healthy/warning/slack;min-healthy/critical/slack"
+	for i := 0; i < b.N; i++ {
+		ParseRoutes(routeString)
+	}
+}
+
+func BenchmarkParseRoutesFor3Routes(b *testing.B) {
+	routeString := "min-healthy/warning/slack;min-healthy/critical/slack;min-healthy/resolved/slack"
+	for i := 0; i < b.N; i++ {
+		ParseRoutes(routeString)
+	}
+}
+
+func BenchmarkParseRoutesFor4Routes(b *testing.B) {
+	routeString := "min-healthy/warning/slack;min-healthy/critical/slack;min-healthy/resolved/slack;*/pass/*"
+	for i := 0; i < b.N; i++ {
+		ParseRoutes(routeString)
+	}
 }

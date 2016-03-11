@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/ashwanthkumar/marathon-alerts/checks"
+	"github.com/ashwanthkumar/marathon-alerts/notifiers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestKey(t *testing.T) {
@@ -48,30 +50,36 @@ func TestCheckExists(t *testing.T) {
 }
 
 func TestProcessCheckWhenNewCheckArrives(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
 	suppressedApps := make(map[string]time.Time)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
 	check := checks.AppCheck{
 		App:       "/foo",
 		CheckName: "check-name",
 		Result:    checks.Warning,
 	}
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   make(map[string]int),
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  make(map[string]int),
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	actualCheck := <-notifierChannel
-	assert.Equal(t, "/foo", actualCheck.App)
-	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, checks.Warning, actualCheck.Result)
-	assert.Equal(t, 1, actualCheck.Times)
+	expectedCheck := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Warning,
+		Times:     1,
+	}
+	mockNotifier.AssertCalled(t, "Notify", expectedCheck)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
 func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
 	suppressedApps := make(map[string]time.Time)
 	check := checks.AppCheck{
 		App:       "/foo",
@@ -81,18 +89,21 @@ func TestProcessCheckWhenNewPassCheckArrives(t *testing.T) {
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 2
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   alertCount,
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	assert.Len(t, notifierChannel, 0)
+	mockNotifier.AssertNotCalled(t, "Notify", check)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
 }
 
 func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	check := checks.AppCheck{
@@ -103,23 +114,27 @@ func TestProcessCheckWhenExistingCheckOfDifferentLevel(t *testing.T) {
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   alertCount,
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	assert.Len(t, notifierChannel, 1)
-	actualCheck := <-notifierChannel
-	assert.Equal(t, "/foo", actualCheck.App)
-	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, checks.Critical, actualCheck.Result)
-	assert.Equal(t, 2, actualCheck.Times)
+	expectedCheck := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Critical,
+		Times:     2,
+	}
+	mockNotifier.AssertCalled(t, "Notify", expectedCheck)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 2)
 }
 
 func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	alertCount := make(map[string]int)
@@ -130,18 +145,21 @@ func TestProcessCheckWhenExistingCheckOfSameLevel(t *testing.T) {
 		Result:    checks.Warning,
 	}
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   alertCount,
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	assert.Len(t, notifierChannel, 0)
+	mockNotifier.AssertNotCalled(t, "Notify", check)
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 1)
 }
 
 func TestProcessCheckWhenResolvedCheckArrives(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now()
 	check := checks.AppCheck{
@@ -152,24 +170,28 @@ func TestProcessCheckWhenResolvedCheckArrives(t *testing.T) {
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   alertCount,
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	assert.Len(t, notifierChannel, 1)
-	actualCheck := <-notifierChannel
-	assert.Equal(t, "/foo", actualCheck.App)
-	assert.Equal(t, "check-name", actualCheck.CheckName)
-	assert.Equal(t, checks.Resolved, actualCheck.Result)
-	assert.Equal(t, 2, actualCheck.Times)
+	expectedCheck := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Resolved,
+		Times:     2,
+	}
+	mockNotifier.AssertCalled(t, "Notify", expectedCheck)
 	// We remove AlertCount upon Resolved check
 	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
 }
 
 func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 1)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
 	suppressedApps := make(map[string]time.Time)
 	appLabels := make(map[string]string)
 	appLabels["alerts.enabled"] = "false"
@@ -180,22 +202,20 @@ func TestProcessCheckWhenNewCheckArrivesButDisabledViaLabels(t *testing.T) {
 		Labels:    appLabels,
 	}
 	mgr := AlertManager{
-		AppSuppress:  suppressedApps,
-		AlertCount:   make(map[string]int),
-		NotifierChan: notifierChannel,
+		AppSuppress: suppressedApps,
+		AlertCount:  make(map[string]int),
+		Notifiers:   []notifiers.Notifier{mockNotifier},
 	}
 
 	mgr.processCheck(check)
-	assert.Len(t, notifierChannel, 0)
+	mockNotifier.AssertNotCalled(t, "Notify", check)
 }
 
 func TestCleanUpSupressedAlerts(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now().Add(-5 * time.Minute)
 	mgr := AlertManager{
 		AppSuppress:      suppressedApps,
-		NotifierChan:     notifierChannel,
 		AlertCount:       make(map[string]int),
 		SuppressDuration: 1 * time.Minute,
 	}
@@ -206,12 +226,10 @@ func TestCleanUpSupressedAlerts(t *testing.T) {
 }
 
 func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck)
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now().Add(-5 * time.Minute)
 	mgr := AlertManager{
 		AppSuppress:      suppressedApps,
-		NotifierChan:     notifierChannel,
 		AlertCount:       make(map[string]int),
 		SuppressDuration: 10 * time.Minute,
 	}
@@ -222,14 +240,17 @@ func TestCleanUpSupressedAlertsIgnoreIfLessThanSuppressDuration(t *testing.T) {
 }
 
 func TestTimesCountAfterTheCheckHasBeenIdleForSuppressedDuration(t *testing.T) {
-	notifierChannel := make(chan checks.AppCheck, 2)
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
 	alertCount := make(map[string]int)
 	alertCount["/foo-check-name"] = 1
 	suppressedApps := make(map[string]time.Time)
 	suppressedApps["/foo-check-name-2"] = time.Now().Add(-15 * time.Minute)
 	mgr := AlertManager{
 		AppSuppress:      suppressedApps,
-		NotifierChan:     notifierChannel,
+		Notifiers:        []notifiers.Notifier{mockNotifier},
 		AlertCount:       alertCount,
 		SuppressDuration: 10 * time.Minute,
 	}

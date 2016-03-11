@@ -95,11 +95,11 @@ Default routes if none specified is -  `"*/warning/*;*/critical/*;*/resolved/*"`
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).
 
+## Deployment
+We've a sample `marathon.json.conf` that we use in our organization along with [`marathonctl deploy`](https://github.com/ashwanthkumar/marathonctl).
+
 ## Building
 To build from source, you need [`glide`](http://glide.sh/) tool in `$PATH`.
-
-## Deployment
-We've a sample `marathon.json.conf` that we use in our organization along with [`marathonctl deploy`](https://github.com/ashwanthkumar/marathonctl). 
 
 ```
 $ cd $GOPATH/src

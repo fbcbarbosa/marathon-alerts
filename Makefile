@@ -1,7 +1,7 @@
 APPNAME = marathon-alerts
 VERSION=0.0.1-dev
-TESTFLAGS=-v -cover -covermode=atomic
-TEST_COVERAGE_THRESHOLD=48.0
+TESTFLAGS=-v -cover -covermode=atomic -bench=.
+TEST_COVERAGE_THRESHOLD=52.0
 
 build:
 	go build -tags netgo -ldflags "-w" -o ${APPNAME} .
@@ -29,6 +29,7 @@ test:
 	go test ${TESTFLAGS} -coverprofile=main.txt github.com/ashwanthkumar/marathon-alerts/
 	go test ${TESTFLAGS} -coverprofile=checks.txt github.com/ashwanthkumar/marathon-alerts/checks
 	go test ${TESTFLAGS} -coverprofile=notifiers.txt github.com/ashwanthkumar/marathon-alerts/notifiers
+	go test ${TESTFLAGS} -coverprofile=routes.txt github.com/ashwanthkumar/marathon-alerts/routes
 
 test-ci: test
 	gocovmerge *.txt > coverage.txt

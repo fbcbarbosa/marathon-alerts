@@ -18,7 +18,6 @@ import (
 
 var appChecker AppChecker
 var alertManager AlertManager
-var notifyManager NotifyManager
 
 // Check settings
 var minHealthyWarningThreshold float32
@@ -76,12 +75,6 @@ func main() {
 	}
 	appChecker.Start()
 
-	alertManager = AlertManager{
-		CheckerChan:      appChecker.AlertsChannel,
-		SuppressDuration: alertSuppressDuration,
-	}
-	alertManager.Start()
-
 	var allNotifiers []notifiers.Notifier
 	slack := notifiers.Slack{
 		Webhook: slackWebhooks,
@@ -89,11 +82,14 @@ func main() {
 		Owners:  slackOwners,
 	}
 	allNotifiers = append(allNotifiers, &slack)
-	notifyManager = NotifyManager{
-		AlertChan: alertManager.NotifierChan,
-		Notifiers: allNotifiers,
+
+	alertManager = AlertManager{
+		CheckerChan:      appChecker.AlertsChannel,
+		SuppressDuration: alertSuppressDuration,
+		Notifiers:        allNotifiers,
 	}
-	notifyManager.Start()
+	alertManager.Start()
+
 	metrics.RegisterDebugGCStats(DebugMetricsRegistry)
 	metrics.RegisterRuntimeMemStats(DebugMetricsRegistry)
 	go metrics.CaptureDebugGCStats(DebugMetricsRegistry, 15*time.Minute)

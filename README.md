@@ -39,6 +39,7 @@ Apart from the flags that are used while starting up, the functionality can be c
 |  ---    |   ---      |  ---    |
 | alerts.enabled  | Controls if the alerts for the app should be enabled or disabled. Defaults - true | false |
 | alerts.checks.subscribe  | Comma separated list of checks that needs to be run. Defaults - all | all |
+| alerts.routes  | We now have an ability to route different checks to different notifiers based on check level. See the section below on Routes to understand how you can add routes to your apps. Defaults - */resolved/*;*/warning/*;*/critical/* | min-healthy/critical/pagerduty;min-healthy/warning/slack |
 | alerts.min-healthy.critical.threshold  | Failure threshold for min-healthy check. Defaults - `--check-min-healthy-critical-threshold` | 0.5 |
 | alerts.min-healthy.warn.threshold  | Warning threshold for min-healthy check. Defaults - `--check-min-healthy-warn-threshold` | 0.4 |
 | alerts.min-instances.critical.threshold  | Failure threshold for min-instances check. Defaults - `--check-min-instances-critical-threshold` | 0.5 |
@@ -77,6 +78,19 @@ Apart from the standard metrics above, we also collect quite a few other metrics
 | notifications-warning-rate | Meter metric that denotes the rate at which warning notifications are being sent |
 | notifications-critical-rate | Meter metric that denotes the rate at which critical notifications are being sent |
 | notifications-resolved-rate | Meter metric that denotes the rate at which resolved notifications are being sent |
+
+## Routes
+From v0.3.0-RC7 onwards we've an ability to route different check alerts to different notifiers. On a per-app basis you can control the routes using `alerts.routes` label. The format of the value should be as following -
+```
+<check-name>/<check-level>/<notifier-name>;[<check-name>/<check-level>/<notifier-name>]
+```
+
+### Rules
+1. Check name and Notifier names can be glob patterns. No complicated regex allowed as of now.
+2. Check level has to be one of warning / pass / critical / resolved.
+3. Multiple routes can be defined by separating them using `;`.
+
+Default routes if none specified is -  `"*/warning/*;*/critical/*;*/resolved/*"`. It means we'll route all check's warning / critical / resolved notifications to all available notifiers.
 
 ## Releases
 Binaries are available [here](https://github.com/ashwanthkumar/marathon-alerts/releases).

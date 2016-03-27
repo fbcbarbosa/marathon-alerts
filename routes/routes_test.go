@@ -171,6 +171,14 @@ func TestRouteMatchNotifier(t *testing.T) {
 	assert.True(t, route.MatchNotifier("slack"))
 }
 
+func TestRouteMatchCheckResult(t *testing.T) {
+	route := Route{
+		CheckLevel: checks.Warning,
+	}
+	assert.True(t, route.MatchCheckResult(checks.Warning))
+	assert.False(t, route.MatchCheckResult(checks.Pass))
+}
+
 func BenchmarkSimpleParseRoutes(b *testing.B) {
 	routeString := "min-healthy/warning/slack"
 	for i := 0; i < b.N; i++ {

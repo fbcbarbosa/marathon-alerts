@@ -268,3 +268,68 @@ func TestTimesCountAfterTheCheckHasBeenIdleForSuppressedDuration(t *testing.T) {
 	mgr.processCheck(check)
 	assert.Equal(t, 3, mgr.AlertCount["/foo-check-name"])
 }
+
+func TestShouldNotNotifyResolvedBecauseRoutesDoesNotHaveWarning(t *testing.T) {
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
+	suppressedApps := make(map[string]time.Time)
+	suppressedApps["/foo-check-name-2"] = time.Now()
+	appLabels := make(map[string]string)
+	appLabels["alerts.routes"] = "*/resolved/*;*/critical/*"
+	check := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Pass,
+		Labels:    appLabels,
+	}
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
+	mgr := AlertManager{
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
+	}
+
+	mgr.processCheck(check)
+	mockNotifier.AssertNotCalled(t, "Notify", mock.AnythingOfType("AppCheck"))
+	// We remove AlertCount upon Resolved check
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
+}
+
+func TestShouldNotifyResolvedBecauseRoutesHaveWarning(t *testing.T) {
+	mockNotifier := new(notifiers.MockNotifier)
+	mockNotifier.On("Name").Return("mock-notifer")
+	mockNotifier.On("Notify", mock.AnythingOfType("AppCheck")).Return(nil)
+
+	suppressedApps := make(map[string]time.Time)
+	suppressedApps["/foo-check-name-2"] = time.Now()
+	appLabels := make(map[string]string)
+	appLabels["alerts.routes"] = "*/resolved/*;*/warning/*"
+	check := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Pass,
+		Labels:    appLabels,
+	}
+	alertCount := make(map[string]int)
+	alertCount["/foo-check-name"] = 1
+	mgr := AlertManager{
+		AppSuppress: suppressedApps,
+		AlertCount:  alertCount,
+		Notifiers:   []notifiers.Notifier{mockNotifier},
+	}
+
+	mgr.processCheck(check)
+	expectedCheck := checks.AppCheck{
+		App:       "/foo",
+		CheckName: "check-name",
+		Result:    checks.Resolved,
+		Times:     2,
+		Labels:    appLabels,
+	}
+	mockNotifier.AssertCalled(t, "Notify", expectedCheck)
+	// We remove AlertCount upon Resolved check
+	assert.Equal(t, mgr.AlertCount["/foo-check-name"], 0)
+}

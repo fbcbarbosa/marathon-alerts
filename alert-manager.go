@@ -84,17 +84,20 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 			fmt.Printf("Error - %v\n", err)
 			return
 		}
-		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, resultIfCheckExists := a.checkExist(check)
+		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, previousCheckLevel := a.checkExist(check)
 
 		if checkExists && check.Result == checks.Pass {
 			a.AlertCount[keyPrefixIfCheckExists]++
 			check.Times = a.AlertCount[keyPrefixIfCheckExists]
 			check.Result = checks.Resolved
+			previousRouteExists := a.checkForRouteWithCheckLevel(previousCheckLevel, allRoutes)
 			delete(a.AppSuppress, keyIfCheckExists)
 			delete(a.AlertCount, keyPrefixIfCheckExists)
-			a.notifyCheck(check, allRoutes)
-			a.incNotifCounter(check)
-		} else if checkExists && check.Result != resultIfCheckExists {
+			if previousRouteExists {
+				a.notifyCheck(check, allRoutes)
+				a.incNotifCounter(check)
+			}
+		} else if checkExists && check.Result != previousCheckLevel {
 			delete(a.AppSuppress, keyIfCheckExists)
 			key := a.key(check, check.Result)
 			a.AppSuppress[key] = check.Timestamp
@@ -122,6 +125,16 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 	} else {
 		fmt.Printf("Monitoring disabled for %s via alerts.enabled label in app config\n", check.App)
 	}
+}
+
+func (a *AlertManager) checkForRouteWithCheckLevel(level checks.CheckStatus, allRoutes []routes.Route) bool {
+	for _, route := range allRoutes {
+		if route.MatchCheckResult(level) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (a *AlertManager) notifyCheck(check checks.AppCheck, allRoutes []routes.Route) {

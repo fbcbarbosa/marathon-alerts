@@ -33,6 +33,10 @@ func (r *Route) MatchNotifier(notifier string) bool {
 	return glob.Glob(r.Notifier, notifier)
 }
 
+func (r *Route) MatchCheckResult(level checks.CheckStatus) bool {
+	return r.CheckLevel == level
+}
+
 func ParseRoutes(routes string) ([]Route, error) {
 	var finalRoutes []Route
 	routesAsString := strings.Split(routes, ";")

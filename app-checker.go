@@ -44,12 +44,12 @@ func (a *AppChecker) Start() {
 	a.IsSnoozed = false
 
 	go a.run()
-	fmt.Println("App Checker Started.")
-	fmt.Printf("App Checker - Checking the status of all the apps every %v\n", a.CheckInterval)
+	log.Println("App Checker Started.")
+	log.Printf("App Checker - Checking the status of all the apps every %v\n", a.CheckInterval)
 }
 
 func (a *AppChecker) Stop() {
-	fmt.Println("Stopping App Checker...")
+	log.Println("Stopping App Checker...")
 	close(a.stopChannel)
 	a.RunWaitGroup.Done()
 }

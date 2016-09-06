@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -29,17 +30,17 @@ type AlertManager struct {
 }
 
 func (a *AlertManager) Start() {
-	fmt.Println("Starting Alert Manager...")
+	log.Println("Starting Alert Manager...")
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
 	a.AppSuppress = make(map[string]time.Time)
 	a.AlertCount = make(map[string]int)
 	go a.run()
-	fmt.Println("Alert Manager Started.")
+	log.Println("Alert Manager Started.")
 }
 
 func (a *AlertManager) Stop() {
-	fmt.Println("Stopping Alert Manager...")
+	log.Println("Stopping Alert Manager...")
 	close(a.stopChannel)
 	a.RunWaitGroup.Done()
 }
@@ -81,7 +82,7 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 	if alertEnabled {
 		allRoutes, err := routes.ParseRoutes(maps.GetString(check.Labels, AppRoutesLabel, routes.DefaultRoutes))
 		if err != nil {
-			fmt.Printf("Error - %v\n", err)
+			log.Printf("Error - %v\n", err)
 			return
 		}
 		checkExists, keyPrefixIfCheckExists, keyIfCheckExists, previousCheckLevel := a.checkExist(check)
@@ -137,7 +138,7 @@ func (a *AlertManager) checkForRouteWithCheckLevel(level checks.CheckStatus, all
 }
 
 func (a *AlertManager) notifyCheck(check checks.AppCheck, allRoutes []routes.Route) {
-	fmt.Printf("[NotifyCheck] App: %s, Result: %s, Check: %s, Reason: %s \n", check.App, checks.CheckStatusToString(check.Result), check.CheckName, check.Message)
+	log.Printf("[NotifyCheck] App: %s, Result: %s, Check: %s, Reason: %s \n", check.App, checks.CheckStatusToString(check.Result), check.CheckName, check.Message)
 	for _, route := range allRoutes {
 		if route.Match(check) {
 			for _, notifier := range a.Notifiers {

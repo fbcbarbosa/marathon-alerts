@@ -31,3 +31,19 @@ const (
 )
 
 var CheckLevels = [...]CheckStatus{Warning, Critical}
+
+func CheckStatusToString(result CheckStatus) string {
+	value := "Unknown"
+	switch result {
+	case Pass:
+		value = "Passed"
+	case Resolved:
+		value = "Resolved"
+	case Warning:
+		value = "Warning"
+	case Critical:
+		value = "Critical"
+	}
+
+	return value
+}

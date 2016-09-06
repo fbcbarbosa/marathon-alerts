@@ -15,12 +15,3 @@ func TestResultToColor(t *testing.T) {
 	assert.Equal(t, "danger", *slack.resultToColor(checks.Critical))
 	assert.Equal(t, "black", *slack.resultToColor(127))
 }
-
-func TestResultToString(t *testing.T) {
-	slack := Slack{}
-	assert.Equal(t, "Passed", slack.resultToString(checks.Pass))
-	assert.Equal(t, "Warning", slack.resultToString(checks.Warning))
-	assert.Equal(t, "Critical", slack.resultToString(checks.Critical))
-	assert.Equal(t, "Resolved", slack.resultToString(checks.Resolved))
-	assert.Equal(t, "Unknown", slack.resultToString(127))
-}

@@ -122,9 +122,8 @@ func (a *AlertManager) processCheck(check checks.AppCheck) {
 			keyPrefix := a.keyPrefix(check)
 			delete(a.AlertCount, keyPrefix)
 		}
-	} else {
-		fmt.Printf("Monitoring disabled for %s via alerts.enabled label in app config\n", check.App)
 	}
+	// TODO - Add a log message that runs only once per every new app / if app state has changed
 }
 
 func (a *AlertManager) checkForRouteWithCheckLevel(level checks.CheckStatus, allRoutes []routes.Route) bool {
@@ -138,7 +137,7 @@ func (a *AlertManager) checkForRouteWithCheckLevel(level checks.CheckStatus, all
 }
 
 func (a *AlertManager) notifyCheck(check checks.AppCheck, allRoutes []routes.Route) {
-	fmt.Printf("[NotifyCheck] Check: %s, Reason: %s ", check.CheckName, check.Message)
+	fmt.Printf("[NotifyCheck] App: %s, Result: %s, Check: %s, Reason: %s \n", check.App, checks.CheckStatusToString(check.Result), check.CheckName, check.Message)
 	for _, route := range allRoutes {
 		if route.Match(check) {
 			for _, notifier := range a.Notifiers {

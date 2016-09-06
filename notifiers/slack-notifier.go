@@ -27,7 +27,7 @@ func (s *Slack) Notify(check checks.AppCheck) {
 	attachment.
 		AddField(slack.Field{Title: "App", Value: check.App, Short: true}).
 		AddField(slack.Field{Title: "Check", Value: check.CheckName, Short: true}).
-		AddField(slack.Field{Title: "Result", Value: s.resultToString(check.Result), Short: true}).
+		AddField(slack.Field{Title: "Result", Value: checks.CheckStatusToString(check.Result), Short: true}).
 		AddField(slack.Field{Title: "Times", Value: fmt.Sprintf("%d", check.Times), Short: true})
 
 	destination := maps.GetString(check.Labels, "alerts.slack.channel", s.Channel)
@@ -76,22 +76,6 @@ func (s *Slack) resultToColor(result checks.CheckStatus) *string {
 	}
 
 	return &color
-}
-
-func (s *Slack) resultToString(result checks.CheckStatus) string {
-	value := "Unknown"
-	switch result {
-	case checks.Pass:
-		value = "Passed"
-	case checks.Resolved:
-		value = "Resolved"
-	case checks.Warning:
-		value = "Warning"
-	case checks.Critical:
-		value = "Critical"
-	}
-
-	return value
 }
 
 func (s *Slack) parseOwners(owners []string) string {

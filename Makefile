@@ -8,9 +8,11 @@ build:
 
 build-linux:
 	GOOS=linux GOARCH=amd64 go build -tags netgo -ldflags "-w -s -X main.APP_VERSION=${VERSION}" -v -o ${APPNAME}-linux-amd64 .
+	shasum -a256 ${APPNAME}-linux-amd64
 
 build-mac:
 	GOOS=darwin GOARCH=amd64 go build -tags netgo -ldflags "-w -s -X main.APP_VERSION=${VERSION}" -v -o ${APPNAME}-darwin-amd64 .
+	shasum -a256 ${APPNAME}-darwin-amd64
 
 build-all: build-mac build-linux
 

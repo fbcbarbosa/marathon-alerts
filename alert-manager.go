@@ -138,6 +138,7 @@ func (a *AlertManager) checkForRouteWithCheckLevel(level checks.CheckStatus, all
 }
 
 func (a *AlertManager) notifyCheck(check checks.AppCheck, allRoutes []routes.Route) {
+	fmt.Printf("[NotifyCheck] Check: %s, Reason: %s ", check.CheckName, check.Message)
 	for _, route := range allRoutes {
 		if route.Match(check) {
 			for _, notifier := range a.Notifiers {

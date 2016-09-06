@@ -119,7 +119,7 @@ func defineFlags() {
 	flag.StringVar(&marathonURI, "uri", "", "Marathon URI to connect")
 	flag.StringVar(&pidFile, "pid", "PID", "File to write PID file")
 	flag.BoolVar(&debugMode, "debug", false, "Enable debug mode. More counters for now.")
-	flag.DurationVar(&checkInterval, "check-interval", 30*time.Second, "Check runs periodically on this interval")
+	flag.DurationVar(&checkInterval, "check-interval", 60*time.Second, "Check runs periodically on this interval")
 	flag.DurationVar(&alertSuppressDuration, "alerts-suppress-duration", 30*time.Minute, "Suppress alerts for this duration once notified")
 
 	// Check flags

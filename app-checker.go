@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -36,7 +35,7 @@ type AppChecker struct {
 }
 
 func (a *AppChecker) Start() {
-	fmt.Println("Starting App Checker...")
+	log.Println("Starting App Checker...")
 	a.RunWaitGroup.Add(1)
 	a.stopChannel = make(chan bool)
 	a.AlertsChannel = make(chan checks.AppCheck)

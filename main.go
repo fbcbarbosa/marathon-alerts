@@ -37,9 +37,12 @@ var slackWebhooks string
 var slackChannel string
 var slackOwners string
 
+// DebugMetricsRegistry is used for pushing debug level metrics by rest of the app
 var DebugMetricsRegistry metrics.Registry
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	os.Args[0] = "marathon-alerts"
 	defineFlags()
 	flag.Parse()

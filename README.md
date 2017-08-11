@@ -1,4 +1,4 @@
-[![Build Status](https://snap-ci.com/ashwanthkumar/marathon-alerts/branch/master/build_image)](https://snap-ci.com/ashwanthkumar/marathon-alerts/branch/master)
+[![Build Status](https://travis-ci.org/ashwanthkumar/marathon-alerts.svg?branch=master)](https://travis-ci.org/ashwanthkumar/marathon-alerts)
 [![codecov.io](https://codecov.io/github/ashwanthkumar/marathon-alerts/coverage.svg?branch=master)](https://codecov.io/github/ashwanthkumar/marathon-alerts?branch=master)
 
 # marathon-alerts

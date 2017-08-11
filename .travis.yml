@@ -17,6 +17,6 @@ install:
   - make setup
 
 script:
-  - make test
+  - make test-ci
   - make build-all
 
